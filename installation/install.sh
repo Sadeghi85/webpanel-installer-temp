@@ -11,7 +11,7 @@ if [ "$HOME" == "" ]; then
 fi
 
 # check if webpanel is already installed
-if [ -e "/etc/default/webpanel" ]; then
+if [ -f "/etc/default/webpanel" ]; then
 	echo "WebPanel is already installed."
 	exit 1
 fi
