@@ -1,0 +1,692 @@
+
+1. After cloning VMware image:
+
+	# cd /etc/udev/rules.d
+	# cp 70-persistent-net.rules /root/
+	# rm 70-persistent-net.rules
+	# reboot
+
+2. Setting static IP & dns:
+	
+	**Note**
+		# cat /etc/udev/rules.d/70-persistent-net.rules
+		
+		Device name must match the name in "70-persistent-net.rules", which means you may need to create a new device in system-config-network or
+			simply copy /etc/sysconfig/network-scripts/ifcfg-eth0 as /etc/sysconfig/network-scripts/ifcfg-eth1 etc.
+	
+	a. Use "system-config-network" or "setup"
+		# system-config-network
+		# service network restart
+		
+	b. Failing that, edit these files:
+	
+		# vi /etc/sysconfig/network-scripts/ifcfg-eth1
+		[…]
+			DEVICE=eth1
+			TYPE=Ethernet
+			UUID=xxxx-xxxxx-xxxxxxxxxxxxxxxxx
+			ONBOOT=yes
+			NM_CONTROLLED=no
+			BOOTPROTO=none
+			HWADDR=xx:xx:xx:xx:xx:xx
+			IPADDR=192.168.150.16
+			NETMASK=255.255.255.0
+			GATEWAY=192.168.150.2
+			DNS1=192.168.150.2
+			DEFROUTE=yes
+			IPV4_FAILURE_FATAL=yes
+			IPV6INIT=no
+			NAME="System eth1"
+			METRIC=1
+			PEERDNS=no
+		[…]
+
+		# vi /etc/sysconfig/network
+		[…]
+			NETWORKING=yes
+			HOSTNAME=localhost.localdomain
+			GATEWAY=192.168.150.2
+		[…]
+
+		# vi /etc/hosts
+		[…]
+			192.168.150.16 localhost.localdomain
+		[…]
+			
+		# vi /etc/resolv.conf
+		[…]
+			nameserver 192.168.150.2
+		[…]
+		
+		# service network restart
+		
+3. Configuring repos:
+
+	a. Install yum-priorities:
+		
+		# yum -y install yum-plugin-priorities yum-plugin-rpm-warm-cache
+		
+	b. EPEL:
+		
+		# rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+		
+	c. IUS:
+	
+		# rpm -ivh http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/ius-release-1.0-11.ius.centos6.noarch.rpm
+		
+		**List of available packages in IUS:
+		# yum list | grep -w \.ius\.
+	
+	d. RPMForge:
+	
+		# rpm -ivh http://apt.sw.be/redhat/el6/en/x86_64/rpmforge/RPMS/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+	
+	e. CentALT:
+		
+		# rpm -ivh http://centos.alt.ru/repository/centos/6/x86_64/centalt-release-6-1.noarch.rpm
+		
+	f. Nginx:
+		
+		# vi /etc/yum.repos.d/nginx.repo
+		[…]
+			[nginx]
+			priority=1
+			name=nginx repo
+			baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+			gpgcheck=0
+			enabled=1
+		[…]
+		
+	g. Edit repo files in /etc/yum.reps.d to add priorities:
+	
+		# vi /etc/yum.repos.d/CentOS-Base.repo
+		[…]
+			[base]
+			priority=1
+			name=CentOS-$releasever - Base
+			...
+
+			#released updates 
+			[updates]
+			priority=1
+			name=CentOS-$releasever - Updates
+			...
+
+			#additional packages that may be useful
+			[extras]
+			priority=1
+			name=CentOS-$releasever - Extras
+			...
+		[…]
+		
+		# vi /etc/yum.repos.d/ius.repo
+		[…]
+			[ius]
+			priority=1
+			name=IUS Community Packages for Enterprise Linux 6 - $basearch
+			...
+		[…]
+		
+		# vi /etc/yum.repos.d/centalt.repo
+		[…]
+			[CentALT]
+			name=CentALT Packages for Enterprise Linux 6 - $basearch
+			enabled=0
+			...
+		[…]
+	
+	h. Install some packages:
+	
+		# yum -y install htop nmap yum-plugin-replace
+
+4. Installing PHP54, Nginx, Apache & MySQL55:
+
+	a. Installing mysql:
+	
+		# yum install mysql
+		
+		# yum replace mysql --replace-with mysql55
+		# yum install mysql55-server
+		
+		# service mysqld start
+		# chkconfig mysqld on
+		
+		# mysql_secure_installation
+		
+	b. Insalling php & apache:
+		
+		# yum install httpd php54 php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-pdo php54-pear php54-tidy php54-xml php54-xcache
+		
+		# chkconfig php-fpm on
+		# chkconfig httpd on
+		
+		# vi /etc/php.ini
+		[…]
+			allow_url_fopen = Off
+			
+			error_reporting = E_ALL & ~E_NOTICE & ~E_DEPRECATED
+		[…]
+		
+	c. Insalling nginx:
+	
+		# yum install nginx
+		
+		# chkconfig nginx on
+	
+	d. Updating firewall rules:
+	
+		# vi /etc/sysconfig/iptables
+		[…]
+			-A INPUT -m tcp -p tcp --dport 80 -j ACCEPT
+		[…]
+		# service iptables restart
+
+5. Installing Webmin:
+	
+	# yum -y install perl-Net-SSLeay
+	
+	# rpm -Uvh webmin-1.630-1.noarch.rpm
+	
+	# vi /etc/webmin/miniserv.conf
+	[…]
+		ssl=1
+	[…]
+	# service webmin restart
+	
+	# vi /etc/sysconfig/iptables
+	[…]
+		-A INPUT -m tcp -p tcp --dport 10000 -j ACCEPT
+	[…]
+	# service iptables restart
+
+6. Configuring PHP-FPM, Nginx & Apache:
+
+	a. PHP-FPM:
+		
+		# mkdir -p /etc/php-fpm.d/sites-available
+		# mkdir -p /etc/php-fpm.d/sites-enabled
+		
+		# mv /etc/php-fpm.d/www.conf /etc/php-fpm.d/www.conf.disabled
+		# cp /etc/php-fpm.d/www.conf.disabled /etc/php-fpm.d/example.com.conf.disabled
+		
+		# vi /etc/php-fpm.conf
+		[…]
+			include=/etc/php-fpm.d/sites-enabled/*.conf
+			
+			error_log = /var/log/php-fpm/server_error.log
+		[…]
+		
+	b. Apache:
+	
+		# yum install --enablerepo "CentALT" mod_fastcgi mod_rpaf
+		
+		# mkdir -p /usr/lib/cgi-bin
+		# mkdir -p /etc/httpd/conf/sites-available
+		# mkdir -p /etc/httpd/conf/sites-enabled
+		# cp /var/www/error/noindex.html /var/www/html/index.html
+		# mv /etc/httpd/conf.d/php.conf /etc/httpd/conf.d/php.conf.disabled
+		
+		# vi /etc/sysconfig/httpd
+		[…]
+			HTTPD=/usr/sbin/httpd.event
+		[…]
+		
+		# vi /etc/httpd/conf.d/fastcgi.conf
+		[…]
+			FastCgiWrapper Off
+		[…]
+		
+		# vi /etc/httpd/conf.d/welcome.conf
+		[…]
+			<LocationMatch "^/+$">
+				Options -Indexes
+				ErrorDocument 403 /error/HTTP_FORBIDDEN.html.var
+			</LocationMatch>
+		[…]
+		
+		# vi /etc/httpd/conf.d/deflate.conf.disabled
+		[…]
+			<IfModule mod_deflate.c>
+
+				AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/xml application/xhtml+xml application/rss+xml application/atom+xml application/rdf+xml application/json application/javascript application/x-javascript
+			</IfModule>
+		[…]
+		
+		# vi /etc/httpd/conf.d/expires.conf
+		[…]
+			<IfModule mod_expires.c>
+			<IfModule mod_headers.c>
+				Header unset ETag
+				FileETag None
+
+				<FilesMatch "\.(jpe?g|png|gif|js|css|swf|flv)$">
+					ExpiresActive On
+					ExpiresDefault "access plus 1 week"
+				</FilesMatch>
+			</IfModule>
+			</IfModule>
+		[…]
+		
+		# vi /etc/httpd/conf.d/rpaf.conf
+		[…]
+			LoadModule rpaf_module modules/mod_rpaf-2.0.so
+			
+			<IfModule mod_rpaf-2.0.c>
+				RPAFenable On
+				RPAFsethostname Off
+				RPAFproxy_ips 127.0.0.1 ::1
+				RPAFheader X-Real-IP
+			</IfModule>
+		[…]
+		
+		# vi /etc/httpd/conf.d/php-fpm.conf.disabled
+		[…]
+			<IfModule mod_fastcgi.c>
+			<IfModule mod_actions.c>
+			<IfModule mod_alias.c>
+				DirectoryIndex index.php index.html index.htm
+				AddHandler php5-fcgi .php
+				Action php5-fcgi-www /php5-fcgi-www
+				Alias /php5-fcgi-www /usr/lib/cgi-bin/php5-fcgi-www
+				FastCgiExternalServer /usr/lib/cgi-bin/php5-fcgi-www -socket /var/run/php-fpm/www.sock -pass-header Authorization -flush -idle-timeout 3610
+			</IfModule>
+			</IfModule>
+			</IfModule>
+		[…]
+		
+		**Enable these apache modules:
+		
+			actions alias deflate expires fastcgi headers rewrite rpaf
+			
+		# vi /etc/httpd/conf/httpd.conf
+		[…]
+			ServerTokens Prod
+			
+			Timeout 120
+			KeepAlive On
+			MaxKeepAliveRequests 50
+			KeepAliveTimeout 2
+
+			<IfModule event.c>
+				ServerLimit         50
+				ThreadLimit         50
+
+				StartServers        2
+				MinSpareThreads     50
+				MaxSpareThreads     100
+				ThreadsPerChild     50
+
+				MaxClients          3000
+				MaxRequestsPerChild 0
+			</IfModule>
+
+			Listen 127.0.0.1:80
+			
+			#LoadModule actions_module modules/mod_actions.so
+			#LoadModule alias_module modules/mod_alias.so
+			#LoadModule deflate_module modules/mod_deflate.so
+			#LoadModule expires_module modules/mod_expires.so
+			#LoadModule fastcgi_module modules/mod_fastcgi.so
+			#LoadModule headers_module modules/mod_headers.so
+			#LoadModule rewrite_module modules/mod_rewrite.so
+			#LoadModule rpaf_module modules/mod_rpaf-2.0.so
+
+			# Forbid TRACE & TRACK request methods
+			<IfModule mod_rewrite.c>
+				RewriteEngine on
+				RewriteCond %{REQUEST_METHOD} ^(TRACE|TRACK)
+				RewriteRule .* - [F]
+			</IfModule>
+			
+			ServerName localhost:80
+			
+			ErrorLog logs/server_error.log
+			CustomLog logs/server_access.log combined
+			
+			ServerSignature Off
+			
+			NameVirtualHost *:80
+			
+			<VirtualHost *:80>
+				DocumentRoot "/var/www/html"
+				
+				<Directory "/var/www/html">
+					Order allow,deny
+					Allow from all
+					
+					Options -Indexes
+					Options +FollowSymLinks
+					AllowOverride All
+				</Directory>
+				
+				ServerName localhost:80
+				
+				ErrorLog /var/log/httpd/localhost_error.log
+				LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" combined
+				CustomLog /var/log/httpd/localhost_access.log combined
+			</VirtualHost>
+			
+			Include /etc/httpd/conf/sites-enabled/*.conf
+		[…]
+		
+	c. Nginx:
+	
+		# mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.disabled
+		# mv /etc/nginx/conf.d/example_ssl.conf /etc/nginx/conf.d/example_ssl.conf.disabled
+		
+		# mkdir -p /etc/nginx/conf.d/sites-available
+		# mkdir -p /etc/nginx/conf.d/sites-enabled
+		
+		# vi /etc/nginx/nginx.conf
+		[…]
+			user nginx;
+			worker_processes 2;
+			worker_rlimit_nofile 65000;
+			
+			error_log  /var/log/nginx/server_error.log warn;
+
+			events {
+				worker_connections 30000;
+				accept_mutex off;
+			}
+
+			http {
+				
+				#access_log  /var/log/nginx/access.log  main;
+				access_log off;
+				
+				sendfile       on;
+				tcp_nopush     on;
+				
+				keepalive_timeout  30;
+				
+				gzip off;
+				
+				include /etc/nginx/conf.d/*.conf;
+				include /etc/nginx/conf.d/sites-enabled/*.conf;
+			}
+			
+		[…]
+		
+		# vi /etc/nginx/conf.d/000proxy-general.conf
+		[…]
+			proxy_http_version      1.1;
+			proxy_set_header        Connection   "";
+			proxy_redirect          off;
+			proxy_set_header        Host            $host;
+			proxy_set_header        X-Real-IP       $remote_addr;
+			proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+			proxy_pass_header       Server;
+			proxy_connect_timeout   60;
+			proxy_send_timeout      60;
+			proxy_read_timeout      60;
+			proxy_buffers           32 8k;
+
+			upstream http_backend {
+				server 127.0.0.1:80;
+				keepalive 16;
+			}
+			
+			server_tokens off;
+		[…]
+		
+	d. Webalizer:
+		
+		# mkdir -p /etc/webalizer.d/sites-available
+		# mkdir -p /etc/webalizer.d/sites-enabled
+
+7. Creating templates:
+	
+	a. PHP-FPM pool definition:
+	
+		# vi /etc/php-fpm.d/sites-available/example.com.conf.disabled
+		[…]
+			; Start a new pool named 'example.com'.
+			[example.com]
+			
+			; listen = 127.0.0.1:9000
+			listen = /var/run/php-fpm/example.com.sock
+			
+			listen.allowed_clients = 127.0.0.1
+			
+			user = php-example_com
+			group = ftp-example_com
+			
+			pm = dynamic
+			pm.max_children = 50
+			pm.start_servers = 2
+			pm.min_spare_servers = 1
+			pm.max_spare_servers = 3
+			pm.max_requests = 5000
+			
+			request_terminate_timeout = 60 ; 3600
+			
+			access.format = "%R - %u [%t] \"%m %r%Q%q\" %s %f %{mili}d %{kilo}M %C%%"
+			access.log = /var/log/php-fpm/$pool_access.log
+			
+			request_slowlog_timeout = 5
+			slowlog = /var/log/php-fpm/$pool_slow.log
+
+			catch_workers_output = yes
+			
+			php_admin_flag[display_errors] = off
+			php_admin_flag[log_errors] = on
+			php_admin_value[memory_limit] = 32M
+			;php_admin_value[post_max_size] = 22M
+			;php_admin_value[upload_max_filesize] = 20M
+			php_admin_value[max_execution_time] = 30
+			php_admin_value[date.timezone] = Asia/Tehran
+			php_admin_value[session.save_path] = /var/lib/php/session
+			php_admin_value[error_log] = /var/log/php-fpm/$pool_error.log
+			php_admin_value[open_basedir] = "/usr/share/pear:/tmp:/var/www/example.com"
+			
+		[…]
+	
+	b. Apache virtual host:
+		
+		# vi /etc/httpd/conf/sites-available/example.com.disabled
+		[…]
+			<VirtualHost *:80>
+				DocumentRoot "/var/www/example.com/www"
+				
+				<Directory "/var/www/example.com/www">
+					Allow from all
+					Options -Indexes
+					Options +FollowSymLinks
+					AllowOverride All
+				</Directory>
+				
+				ServerName example.com
+				ServerAlias www.example.com
+				
+				ErrorLog /var/log/httpd/example.com_error.log
+				LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" combined
+				CustomLog /var/log/httpd/example.com_access.log combined
+				
+				<IfModule mod_fastcgi.c>
+				<IfModule mod_actions.c>
+				<IfModule mod_alias.c>
+					DirectoryIndex index.php index.html index.htm
+					AddHandler php5-fcgi-example.com .php
+					Action php5-fcgi-example.com /php5-fcgi-example.com
+					Alias /php5-fcgi-example.com /usr/lib/cgi-bin/php5-fcgi-example.com
+					FastCgiExternalServer /usr/lib/cgi-bin/php5-fcgi-example.com -socket /var/run/php-fpm/example.com.sock -pass-header Authorization -flush -idle-timeout 3610
+				</IfModule>
+				</IfModule>
+				</IfModule>
+			</VirtualHost>
+		[…]
+		
+	c. Nginx virtual host:
+		
+		# vi /etc/nginx/conf.d/sites-available/example.com.conf.disabled
+		[…]
+			server {
+					root /var/www/example.com/public_html; 
+					index index.php index.html index.htm;
+					server_name www.example.com example.com;
+					
+					listen   192.168.120.30:80;
+					
+					client_header_timeout   20;
+					#client_max_body_size    22m;
+					client_body_buffer_size 2m;
+
+					gzip on;
+					gzip_types text/plain text/xml text/css text/javascript application/xml application/xhtml+xml application/rss+xml application/atom+xml application/rdf+xml application/json application/javascript application/x-javascript; # text/html is added by default
+					gzip_comp_level 6;
+					gzip_buffers 32 8k;
+					gzip_min_length 1280;
+					gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+					gzip_vary on;
+					
+					#proxy_cache_key "$scheme$host$request_uri";
+					#proxy_cache_path /var/cache/nginx levels=2:2:2 keys_zone=my-cache:100m max_size=5000m inactive=60m;
+					#proxy_temp_path /var/cache/nginx/tmp;
+					#proxy_cache_bypass $http_authorization;
+					#proxy_no_cache $http_authorization;
+					#proxy_cache_use_stale updating;
+					#proxy_cache_valid 200 301 302 60m;
+					#proxy_cache_valid 404 1m;
+					
+					#location / {
+					#		proxy_pass      http://http_backend;
+					#		#proxy_buffering off;
+					#		#proxy_cache my-cache;
+					#		proxy_hide_header  X-Mod-Pagespeed;
+					#		proxy_hide_header  X-Powered-By;
+					#}
+					
+					location ~ /\.ht {
+							deny all;
+					}
+
+					location ~* \.(xml|css|js|png|jpe?g|gif|bmp|swf|flv|mp3|ogg|m4a|wma|3gp|mp4|m4v|mpe?g|mov|mkv|dat|webm|avi|asx|asf|wmv|doc|docx|pdf|rtf|xls|xlsx|ppt|pptx|jar|7z|rar|zip|tar|gz|bz|bin|exe|dll|msi|msp|iso|img)$ {
+							try_files $uri @php;
+							expires 7d;
+					}
+					
+					location ~* \.php$ {
+							error_page 403 = @php;
+							return 403;
+					}
+					
+					location / {
+							try_files $uri @php;
+
+							proxy_pass      http://http_backend; # Defined in "00proxy-general.conf"
+							proxy_buffering on;
+
+					}
+					
+					location @php {
+							proxy_pass      http://http_backend; # Defined in "00proxy-general.conf"
+							proxy_buffering off; # Should be on to use proxy_cache
+							#proxy_cache my-cache;
+							proxy_hide_header  X-Mod-Pagespeed;
+							proxy_hide_header  X-Powered-By;
+					}
+
+			}
+		[…]
+		
+8. Raise number of allowed processes:
+
+	a. Raise:
+
+		# vi /etc/security/limits.d/90-nproc.conf
+		[...]
+
+		*    soft    nproc    2048
+		*    hard    nproc    16384
+		*    soft    nofile    2048
+		*    hard    nofile    65536
+
+
+		#*          soft    nproc     1024
+		root       soft    nproc     unlimited
+
+		[...]
+
+	b. Check:
+
+		# su - apache -s /bin/bash
+
+		-bash-4.1$ ulimit -u
+		-bash-4.1$ ulimit -n
+
+9. Restarting servers:
+
+	# service php-fpm restart
+	# service httpd restart
+	# service nginx restart
+
+10. Installing Webalizer:
+
+	# yum install webalizer
+	
+	# mkdir -p /etc/webalizer.d
+	
+11. Logrotate settings:
+
+	a. Apache:
+	
+		# vi /etc/logrotate.d/httpd
+		[...]
+			/var/log/httpd/*log {
+					weekly
+					missingok
+					rotate 7
+					compress
+					delaycompress
+					notifempty
+					sharedscripts
+					prerotate
+						# go trough config files and generate stats
+						for i in /etc/webalizer.d/*.conf; do webalizer -c $i; done
+					endscript
+					postrotate
+						/sbin/service httpd reload > /dev/null 2>/dev/null || true
+					endscript
+			}
+		[...]
+		
+	b. Nginx:
+	
+		# vi /etc/logrotate.d/nginx
+		[...]
+			/var/log/nginx/*.log {
+					weekly
+					missingok
+					rotate 7
+					compress
+					delaycompress
+					notifempty
+					create 640 nginx adm
+					sharedscripts
+					postrotate
+							[ -f /var/run/nginx.pid ] && kill -USR1 `cat /var/run/nginx.pid`
+					endscript
+			}
+		[...]
+		
+	c. PHP-FPM:
+	
+		# vi /etc/logrotate.d/php-fpm
+		[...]
+			/var/log/php-fpm/*log {
+					weekly
+					missingok
+					rotate 7
+					compress
+					delaycompress
+					notifempty
+					sharedscripts
+					postrotate
+					/bin/kill -SIGUSR1 `cat /var/run/php-fpm/php-fpm.pid 2>/dev/null` 2>/dev/null || true
+					endscript
+			}
+		[...]
+		
+		
+		

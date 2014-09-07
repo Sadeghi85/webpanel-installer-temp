@@ -1,0 +1,18 @@
+#/var/log/httpd/*log {
+#		weekly
+#		missingok
+#		rotate 7
+#		compress
+#		#delaycompress
+#		notifempty
+#		sharedscripts
+#		prerotate
+#			# go trough config files and generate stats
+#			for i in /etc/webalizer.d/*.conf; do webalizer -c $i; done
+#		endscript
+#		postrotate
+#			/sbin/service httpd reload > /dev/null 2>/dev/null || true
+#		endscript
+#}
+# 
+## Intentionally not rotating

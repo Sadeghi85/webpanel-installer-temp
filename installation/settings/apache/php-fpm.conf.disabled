@@ -1,0 +1,11 @@
+<IfModule mod_fastcgi.c>
+<IfModule mod_actions.c>
+<IfModule mod_alias.c>
+	DirectoryIndex index.php index.html index.htm
+	AddHandler php5-fcgi .php
+	Action php5-fcgi-www /php5-fcgi-www
+	Alias /php5-fcgi-www /usr/lib/cgi-bin/php5-fcgi-www
+	FastCgiExternalServer /usr/lib/cgi-bin/php5-fcgi-www -socket /var/run/php-fpm/www.sock -pass-header Authorization -flush -idle-timeout 3610
+</IfModule>
+</IfModule>
+</IfModule>

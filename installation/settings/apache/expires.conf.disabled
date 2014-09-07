@@ -1,0 +1,12 @@
+<IfModule mod_expires.c>
+<IfModule mod_headers.c>
+	Header unset ETag
+	FileETag None
+
+	<FilesMatch "\.(xml|css|js|png|jpe?g|gif|bmp|swf|flv|mp3|ogg|m4a|wma|3gp|mp4|m4v|mpe?g|mov|mkv|dat|webm|avi|asx|asf|wmv|doc|docx|pdf|rtf|xls|xlsx|ppt|pptx|jar|7z|rar|zip|tar|gz|bz|bin|exe|dll|msi|msp|iso|img)$">
+	
+		ExpiresActive On
+		ExpiresDefault "access plus 1 week"
+	</FilesMatch>
+</IfModule>
+</IfModule>

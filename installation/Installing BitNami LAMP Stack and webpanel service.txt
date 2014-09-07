@@ -1,0 +1,39 @@
+
+BitNami: http://bitnami.com/stack/lamp/installer
+
+Install it in /opt/webpanel/lamp
+Apache on port 5000
+MySQL on port 3307
+
+# cd /etc/init.d
+# vi webpanel
+[…]
+	#!/bin/bash
+	# description: service webpanel start/stop/restart
+	# chkconfig: 234 20 80
+
+	WEBPANEL_HOME=/opt/webpanel/lamp
+	export WEBPANEL_HOME
+	PATH=$WEBPANEL_HOME:$PATH
+	export PATH
+
+
+	case $1 in
+	start)
+	sh $WEBPANEL_HOME/ctlscript.sh start
+	;;
+	stop)   
+	sh $WEBPANEL_HOME/ctlscript.sh stop
+	;;
+	restart)
+	sh $WEBPANEL_HOME/ctlscript.sh restart
+	;;
+	esac    
+	exit 0
+[…]
+
+# chmod 755 webpanel
+# chkconfig --add webpanel
+# chkconfig webpanel on
+# service webpanel restart
+
