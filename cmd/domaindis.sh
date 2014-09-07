@@ -13,9 +13,9 @@ if [ $(id -u) -ne 0 ]; then
     echo "This script requires root privileges"
     exit 1
 fi
-SCRIPTDIR=$(dirname $0)
+SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
 
-SERVER_NAME="$(echo $1 | tr '[A-Z]' '[a-z]')"
+SERVER_NAME=$(echo $1 | tr '[A-Z]' '[a-z]')
 
 if ! (echo "$SERVER_NAME" | grep -Eq "^([a-z0-9][-a-z0-9]*\.)+[a-z]+$") then
 	echo "SERVER_NAME ($SERVER_NAME) doesn't seem to be valid. Aborting...."
@@ -25,20 +25,20 @@ fi
 echo "Disabling domain: $SERVER_NAME"
 
 # disabling php-fpm config
-STATUS=$(rm -f "/etc/php-fpm.d/sites-enabled/$SERVER_NAME.conf" 2>&1)
+STATUS=$(rm -f "/etc/php-fpm.d/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 
 # disabling apache config
-STATUS=$(rm -f "/etc/httpd/conf/sites-enabled/$SERVER_NAME.conf" 2>&1)
+STATUS=$(rm -f "/etc/httpd/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 
 # disabling nginx config
-STATUS=$(rm -f "/etc/nginx/conf.d/sites-enabled/$SERVER_NAME.conf" 2>&1)
+STATUS=$(rm -f "/etc/nginx/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 
 # disabling webalizer config
-STATUS=$(rm -f "/etc/webalizer.d/sites-enabled/$SERVER_NAME.conf" 2>&1)
+STATUS=$(rm -f "/etc/webalizer.d/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 
 # Restarting servers
 echo "Restarting servers..."
-STATUS=$(sh "$SCRIPTDIR/restart_servers.sh" 2>&1)
+STATUS=$(sh "$SCRIPT_DIR/restart_servers.sh" 2>&1)
 
 if [ $? != 0 ]; then
 	echo -e "$STATUS\nRestart failed..."

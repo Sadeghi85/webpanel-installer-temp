@@ -1,5 +1,3 @@
-panel/
-lamp/
-STATS/
-LOGS/
+/panel
+/lamp
 *.gz

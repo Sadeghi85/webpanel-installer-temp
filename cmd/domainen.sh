@@ -14,9 +14,9 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
-SCRIPTDIR=$(dirname $0)
+SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
 
-SERVER_NAME="$(echo $1 | tr '[A-Z]' '[a-z]')"
+SERVER_NAME=$(echo $1 | tr '[A-Z]' '[a-z]')
 
 if ! (echo "$SERVER_NAME" | grep -Eq "^([a-z0-9][-a-z0-9]*\.)+[a-z]+$") then
 	echo "SERVER_NAME ($SERVER_NAME) doesn't seem to be valid. Aborting...."
@@ -26,20 +26,20 @@ fi
 echo "Enabling domain: $SERVER_NAME"
 
 # enabling php-fpm config
-STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/php-fpm.d/sites-enabled/$SERVER_NAME.conf" 2>&1)
+STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/php-fpm.d/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 
 # enabling apache config
-STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/httpd/conf/sites-enabled/$SERVER_NAME.conf" 2>&1)
+STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/httpd/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 
 # enabling nginx config
-STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/nginx/conf.d/sites-enabled/$SERVER_NAME.conf" 2>&1)
+STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/nginx/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 
 # enabling webalizer config
-STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/webalizer.d/sites-enabled/$SERVER_NAME.conf" 2>&1)
+STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/webalizer.d/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 
 # Restarting servers
 echo "Restarting servers..."
-STATUS=$(sh "$SCRIPTDIR/restart_servers.sh" 2>&1)
+STATUS=$(sh "$SCRIPT_DIR/restart_servers.sh" 2>&1)
 
 if [ $? != 0 ]; then
 	echo -e "$STATUS\nRestart failed..."

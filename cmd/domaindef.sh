@@ -19,16 +19,16 @@ fi
 HOME="/var/www/WebPanel"
 WEBROOTDIR="web"
 SHELL="/sbin/nologin"
-SCRIPTDIR=$(dirname $0)
+SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
 
-IPPORT="$1"
+IP_PORT="$1"
 
-if ! (echo "$IPPORT" | grep -Pq "^(\d{1,3}\.){3}\d{1,3}:\d{2,5}$") then
-	echo "IPPORT ($IPPORT) doesn't seem to be valid. Aborting...."
+if ! (echo "$IP_PORT" | grep -Pq "^(\d{1,3}\.){3}\d{1,3}:\d{2,5}$") then
+	echo "IP_PORT ($IP_PORT) doesn't seem to be valid. Aborting...."
 	exit 1
 fi
 
-SERVER_NAME="$(echo $2 | tr '[A-Z]' '[a-z]')"
+SERVER_NAME=$(echo $2 | tr '[A-Z]' '[a-z]')
 
 if ! (echo "$SERVER_NAME" | grep -Eq "^([a-z0-9][-a-z0-9]*\.)+[a-z]+$") then
 	echo "SERVER_NAME ($SERVER_NAME) doesn't seem to be valid. Aborting...."
@@ -99,20 +99,20 @@ if [ ! -e "$HOME/$SERVER_NAME" ]; then
 
 	# creating pool definition
 	echo "Creating pool definition..."
-	if [ ! -e "/etc/php-fpm.d/sites-available/$SERVER_NAME.conf" ]; then
-		STATUS=$(cp "$SCRIPTDIR/templates/php-fpm/example.com.conf" "/etc/php-fpm.d/sites-available/$SERVER_NAME.conf" 2>&1)
+	if [ ! -e "/etc/php-fpm.d/settings/sites-available/$SERVER_NAME.conf" ]; then
+		STATUS=$(cp "$SCRIPT_DIR/templates/php-fpm/example.com.conf" "/etc/php-fpm.d/settings/sites-available/$SERVER_NAME.conf" 2>&1)
 		
 		if [ $? != 0 ]; then
 			echo "Couldn't copy the template. Aborting.... message:($STATUS)"
 			exit 1
 		else
-			STATUS=$(sed -i -e"s/example\.com/$SERVER_NAME/g" -e"s/^user\s\+=.*/user = u-$SAFE_SERVER_NAME/" -e"s/^group\s\+=.*/group = u-$SAFE_SERVER_NAME/" "/etc/php-fpm.d/sites-available/$SERVER_NAME.conf" 2>&1)
+			STATUS=$(sed -i -e"s/example\.com/$SERVER_NAME/g" -e"s/^user\s\+=.*/user = u-$SAFE_SERVER_NAME/" -e"s/^group\s\+=.*/group = u-$SAFE_SERVER_NAME/" "/etc/php-fpm.d/settings/sites-available/$SERVER_NAME.conf" 2>&1)
 			
 			if [ $? != 0 ]; then
 				echo "Couldn't edit the pool definition. Aborting.... message:($STATUS)"
 				exit 1
 			else
-				STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/php-fpm.d/sites-enabled/$SERVER_NAME.conf" 2>&1)
+				STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/php-fpm.d/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 			
 				if [ $? != 0 ]; then
 					echo "Couldn't enable the pool. Aborting.... message:($STATUS)"
@@ -126,20 +126,20 @@ if [ ! -e "$HOME/$SERVER_NAME" ]; then
 
 	# creating apache virtual host
 	echo "Creating apache virtual host..."
-	if [ ! -e "/etc/httpd/conf/sites-available/$SERVER_NAME.conf" ]; then
-		STATUS=$(cp "$SCRIPTDIR/templates/apache/example.com.conf" "/etc/httpd/conf/sites-available/$SERVER_NAME.conf" 2>&1)
+	if [ ! -e "/etc/httpd/settings/sites-available/$SERVER_NAME.conf" ]; then
+		STATUS=$(cp "$SCRIPT_DIR/templates/apache/example.com.conf" "/etc/httpd/settings/sites-available/$SERVER_NAME.conf" 2>&1)
 		
 		if [ $? != 0 ]; then
 			echo "Couldn't copy the virtual host template. Aborting.... message:($STATUS)"
 			exit 1
 		else
-			STATUS=$(sed -i -e"s/example\.com/$SERVER_NAME/g" "/etc/httpd/conf/sites-available/$SERVER_NAME.conf" 2>&1)
+			STATUS=$(sed -i -e"s/example\.com/$SERVER_NAME/g" "/etc/httpd/settings/sites-available/$SERVER_NAME.conf" 2>&1)
 			
 			if [ $? != 0 ]; then
 				echo "Couldn't edit the virtual host. Aborting.... message:($STATUS)"
 				exit 1
 			else
-				STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/httpd/conf/sites-enabled/$SERVER_NAME.conf" 2>&1)
+				STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/httpd/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 			
 				if [ $? != 0 ]; then
 					echo "Couldn't enable the virtual host. Aborting.... message:($STATUS)"
@@ -153,20 +153,20 @@ if [ ! -e "$HOME/$SERVER_NAME" ]; then
 
 	# creating nginx virtual host
 	echo "Creating nginx virtual host..."
-	if [ ! -e "/etc/nginx/conf.d/sites-available/$SERVER_NAME.conf" ]; then
-		STATUS=$(cp "$SCRIPTDIR/templates/nginx/example.com.conf" "/etc/nginx/conf.d/sites-available/$SERVER_NAME.conf" 2>&1)
+	if [ ! -e "/etc/nginx/settings/sites-available/$SERVER_NAME.conf" ]; then
+		STATUS=$(cp "$SCRIPT_DIR/templates/nginx/example.com.conf" "/etc/nginx/settings/sites-available/$SERVER_NAME.conf" 2>&1)
 		
 		if [ $? != 0 ]; then
 			echo "Couldn't copy the virtual host template. Aborting.... message:($STATUS)"
 			exit 1
 		else
-			STATUS=$(sed -i -e"s/example\.com/$SERVER_NAME/g" -e"s/\(listen\s\+\).*/\1$IPPORT;/" "/etc/nginx/conf.d/sites-available/$SERVER_NAME.conf" 2>&1)
+			STATUS=$(sed -i -e"s/example\.com/$SERVER_NAME/g" -e"s/\(listen\s\+\).*/\1$IP_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_NAME.conf" 2>&1)
 			
 			if [ $? != 0 ]; then
 				echo "Couldn't edit the virtual host. Aborting.... message:($STATUS)"
 				exit 1
 			else
-				STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/nginx/conf.d/sites-enabled/$SERVER_NAME.conf" 2>&1)
+				STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/nginx/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 			
 				if [ $? != 0 ]; then
 					echo "Couldn't enable the virtual host. Aborting.... message:($STATUS)"
@@ -180,7 +180,7 @@ if [ ! -e "$HOME/$SERVER_NAME" ]; then
 
 	# copying default index page
 	echo "Copying default index page..."
-	STATUS=$(cp "$SCRIPTDIR/templates/web/index.php" "$HOME/$SERVER_NAME/$WEBROOTDIR/index.php" 2>&1)
+	STATUS=$(cp "$SCRIPT_DIR/templates/web/index.php" "$HOME/$SERVER_NAME/$WEBROOTDIR/index.php" 2>&1)
 	
 	if [ $? != 0 ]; then
 		echo "WARNING: Couldn't copy the default index page. message:($STATUS)"
@@ -193,17 +193,17 @@ if [ ! -e "$HOME/$SERVER_NAME" ]; then
 	# creating webalizer config
 	echo "Creating webalizer config..."
 	if [ ! -e "/etc/webalizer.d/sites-available/$SERVER_NAME.conf" ]; then
-		STATUS=$(cp "$SCRIPTDIR/templates/webalizer/example.com.conf" "/etc/webalizer.d/sites-available/$SERVER_NAME.conf" 2>&1)
+		STATUS=$(cp "$SCRIPT_DIR/templates/webalizer/example.com.conf" "/etc/webalizer.d/settings/sites-available/$SERVER_NAME.conf" 2>&1)
 	
 		if [ $? != 0 ]; then
 			echo "WARNING: Couldn't copy the webalizer template. message:($STATUS)"
 		else
-			STATUS=$(sed -i -e"s/example\.com/$SERVER_NAME/g" "/etc/webalizer.d/sites-available/$SERVER_NAME.conf" 2>&1)
+			STATUS=$(sed -i -e"s/example\.com/$SERVER_NAME/g" "/etc/webalizer.d/settings/sites-available/$SERVER_NAME.conf" 2>&1)
 			
 			if [ $? != 0 ]; then
 				echo "WARNING: Couldn't edit the webalizer config. message:($STATUS)"
 			else
-				STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/webalizer.d/sites-enabled/$SERVER_NAME.conf" 2>&1)
+				STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/webalizer.d/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
 			
 				if [ $? != 0 ]; then
 					echo "Couldn't enable the webalizer config. message:($STATUS)"
@@ -216,7 +216,7 @@ if [ ! -e "$HOME/$SERVER_NAME" ]; then
 
 	# Restarting servers
 	echo "Restarting servers..."
-	STATUS=$(sh "$SCRIPTDIR/restart_servers.sh" 2>&1)
+	STATUS=$(sh "$SCRIPT_DIR/restart_servers.sh" 2>&1)
 	
 	if [ $? != 0 ]; then
 		echo -e "$STATUS\nRestart failed..."

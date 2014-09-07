@@ -16,8 +16,8 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
-SCRIPTDIR=$(dirname $0)
-HOME="/var/www"
+SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
+HOME="/var/www/WebPanel"
 
 SERVER_NAME="$(echo $1 | tr '[A-Z]' '[a-z]')"
 
@@ -36,8 +36,26 @@ if ! (echo "$QUOTASIZE" | grep -Pq "^\d+$") then
 	exit 1
 fi
 
+# Quota
+TMP_DIR="/$HOME"
+QUOTA_DIR=""
+while [ "$TMP_DIR" != "" ]
+do
+	if [ "$TMP_DIR" != "/" ]; then
+		QUOTA_DIR=$(echo "$TMP_DIR" | sed -r -e"s/^\/(.+)$/\1/");
+	else
+		QUOTA_DIR="/"
+	fi
+	
+	if grep -qs " $QUOTA_DIR " "/proc/mounts"; then
+		break
+	fi
+	
+	TMP_DIR=$(echo "$TMP_DIR" | sed -r -e"s/^(.*)\/.*?$/\1/")
+done
+
 echo "Setting quota for user: u-$SAFE_SERVER_NAME"
-STATUS=$(setquota -u "u-$SAFE_SERVER_NAME" -F vfsv0 0 "$QUOTASIZE" 0 0 "$HOME" -a 2>&1)
+STATUS=$(setquota -u "u-$SAFE_SERVER_NAME" -F vfsv0 0 "$QUOTASIZE" 0 0 "$QUOTA_DIR" -a 2>&1)
 
 if [ $? != 0 ]; then
 	echo "Couldn't set the quota. Aborting.... message:($STATUS)"
