@@ -49,7 +49,7 @@ fi
 touch "/etc/default/mod-pagespeed"
 touch "/etc/default/webpanel"
 yum -y remove mysql mysql-libs mysql-server
-for PACKAGE in $(ls $SCRIPT_DIR/packages/$ARCH | grep \.rpm$); do rpm -Uh "$PACKAGE"; done
+rpm -Uvh --force $(find $SCRIPT_DIR/packages/$ARCH -name "*" | grep -e .rpm$)
 
 # Quota
 TMP_DIR="/$HOME"
@@ -77,6 +77,7 @@ quotacheck -avugm 1>/dev/null
 quotaon -avug 1>/dev/null
 
 echo -e "#!/bin/bash\ntouch /forcequotacheck" > "/etc/cron.weekly/forcequotacheck"
+chmod +x "/etc/cron.weekly/forcequotacheck"
 
 # config after install
 sh "$SCRIPT_DIR/config_install.inc"
