@@ -39,7 +39,7 @@ fi
 # yum -y install yum-plugin-priorities yum-plugin-rpm-warm-cache yum-plugin-local yum-presto yum-plugin-fastestmirror yum-plugin-replace yum-cron
 
 #installing packages
-# yum -y install iftop iotop bind-utils htop nmap mysql httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-mongo php54-pecl-redis php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx quota redis28u webalizer
+# yum -y install iftop iotop bind-utils htop nmap openssh-clients memcached mysql httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-mongo php54-pecl-memcached php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx quota webalizer
 
 #installing mysql55
 # yum -y replace mysql --replace-with mysql55
