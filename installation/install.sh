@@ -56,7 +56,9 @@ yum clean all
 
 # installing packages
 touch /etc/default/mod-pagespeed
-rpm -ivh --force $(find "$SCRIPT_DIR/packages/$ARCH" -name "*" | grep -e .rpm$)
+rpm -ivh --force $(find "$SCRIPT_DIR/packages/$ARCH" -name "*" | grep -e \.rpm$)
+# install PHP-FPM again
+rpm -ivh --force $(find "$SCRIPT_DIR/packages/$ARCH" -name "*" | grep -e php.*-fpm.*\.rpm$)
 
 ################## server configs
 \cp /etc/selinux/config /etc/selinux/config.bak
@@ -126,10 +128,17 @@ mkdir -p /etc/httpd/settings/sites-enabled-for-humans
 \cp "$SCRIPT_DIR/settings/apache/rpaf.conf" /etc/httpd/conf.d/rpaf.conf
 \cp "$SCRIPT_DIR/settings/apache/php-fpm.conf.disabled" /etc/httpd/conf.d/php-fpm.conf.disabled
 
+\cp /etc/httpd/conf.d/pagespeed.conf /etc/httpd/conf.d/pagespeed.conf.bak
+if [[ $ARCH == "i686" ]]; then
+	\cp "$SCRIPT_DIR/settings/apache/pagespeed.conf.i686" /etc/httpd/conf.d/pagespeed.conf
+else
+	\cp "$SCRIPT_DIR/settings/apache/pagespeed.conf.x86_64" /etc/httpd/conf.d/pagespeed.conf
+fi
+
 \cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.bak
 \cp "$SCRIPT_DIR/settings/apache/httpd.conf" /etc/httpd/conf/httpd.conf
 
-# PHP & PHP-FPM & Memcached & PageSpeed
+# PHP-FPM
 chmod 777 /var/lib/php/session
 mkdir -p /etc/php-fpm.d/settings/sites-available
 mkdir -p /etc/php-fpm.d/settings/sites-enabled
@@ -137,20 +146,23 @@ mkdir -p /etc/php-fpm.d/settings/sites-available-for-humans
 mkdir -p /etc/php-fpm.d/settings/sites-enabled-for-humans
 \mv /etc/php-fpm.d/www.conf /etc/php-fpm.d/www.conf.disabled
 
-\cp /etc/php.ini /etc/php.ini.bak
-\cp "$SCRIPT_DIR/settings/php/php.ini" /etc/php.ini
-
-\cp /etc/sysconfig/memcached /etc/sysconfig/memcached.bak
-\cp "$SCRIPT_DIR/settings/memcached/memcached" /etc/sysconfig/memcached
-
-\cp /etc/php.d/opcache.ini /etc/php.d/opcache.ini.bak
-\cp "$SCRIPT_DIR/settings/php/opcache.ini" /etc/php.d/opcache.ini
-
 \cp /etc/php-fpm.conf /etc/php-fpm.conf.bak
 \cp "$SCRIPT_DIR/settings/php-fpm/php-fpm.conf" /etc/php-fpm.conf
 
-\cp /etc/httpd/conf.d/pagespeed.conf /etc/httpd/conf.d/pagespeed.conf.bak
-\cp "$SCRIPT_DIR/settings/apache/pagespeed.conf" /etc/httpd/conf.d/pagespeed.conf
+# PHP
+\cp /etc/php.ini /etc/php.ini.bak
+\cp "$SCRIPT_DIR/settings/php/php.ini" /etc/php.ini
+
+\cp /etc/php.d/opcache.ini /etc/php.d/opcache.ini.bak
+if [[ $ARCH == "i686" ]]; then
+	\cp "$SCRIPT_DIR/settings/php/opcache.ini.i686" /etc/php.d/opcache.ini
+else
+	\cp "$SCRIPT_DIR/settings/php/opcache.ini.x86_64" /etc/php.d/opcache.ini
+fi
+
+# Memcached
+\cp /etc/sysconfig/memcached /etc/sysconfig/memcached.bak
+\cp "$SCRIPT_DIR/settings/memcached/memcached" /etc/sysconfig/memcached
 
 # Nginx
 \mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.disabled
@@ -217,3 +229,7 @@ FLUSH PRIVILEGES;
 EOF
 
 touch /etc/default/webpanel
+
+#yum -y update
+
+echo "WebPanel is installed"
