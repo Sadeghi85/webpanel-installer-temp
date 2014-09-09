@@ -3,6 +3,7 @@
 SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
 ARCH=$(arch)
 HOME=/var/www/WebPanel
+MYSQL_ROOT_PSSWD="WebPanel"
 
 HOME=${HOME%/}
 if [[ $HOME == "" ]]; then
@@ -88,7 +89,7 @@ do
 		QUOTA_DIR="/"
 	fi
 	
-	if grep -qs " $QUOTA_DIR " /proc/mounts; then
+	if [[ grep -qs " $QUOTA_DIR " /proc/mounts ]]; then
 		QUOTA_DIR_ESC=$(sed 's/[\*\.&\/]/\\&/g' <<<"$QUOTA_DIR")
 		sed -i -r -e"s/( $QUOTA_DIR_ESC .*?defaults)/\1,usrjquota=aquota\.user,grpjquota=aquota\.group,jqfmt=vfsv0/I" /etc/fstab
 		mount -o remount "$QUOTA_DIR" 1>/dev/null
@@ -102,9 +103,17 @@ quotacheck -avugm 1>/dev/null 2>/dev/null
 quotaon -avug 1>/dev/null 2>/dev/null
 
 echo -e "#!/bin/bash\ntouch /forcequotacheck" > /etc/cron.weekly/forcequotacheck
-chmod +x /etc/cron.weekly/forcequotacheck
+chmod 755 /etc/cron.weekly/forcequotacheck
 
 ################# config after install
+chmod 750 $(find "$SCRIPT_DIR/../cmd" -name "*" | grep \.sh$)
+
+# web
+mkdir -p "$HOME/sites-available"
+mkdir -p "$HOME/sites-enabled"
+mkdir -p "$HOME/sites-available-for-humans"
+mkdir -p "$HOME/sites-enabled-for-humans"
+
 # Apache
 mkdir -p /usr/lib/cgi-bin
 mkdir -p /etc/httpd/settings/sites-available
@@ -205,7 +214,7 @@ service iptables restart
 \cp /etc/security/limits.d/90-nproc.conf /etc/security/limits.d/90-nproc.conf.bak
 \cp "$SCRIPT_DIR/settings/limits/90-nproc.conf" /etc/security/limits.d/90-nproc.conf
 
-# starting Apache, Memcached, MySQL & Nginx
+# starting Apache, Memcached, MySQL, Nginx & PHP-FPM
 chkconfig httpd on
 chkconfig memcached on
 chkconfig mysqld on
@@ -217,7 +226,6 @@ service memcached restart
 service mysqld restart
 service nginx restart
 
-MYSQL_ROOT_PSSWD="WebPanel"
 #mysql_secure_installation
 mysql -u root <<EOF
 UPDATE mysql.user SET Password=PASSWORD('$MYSQL_ROOT_PSSWD') WHERE User='root';

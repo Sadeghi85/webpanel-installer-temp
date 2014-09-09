@@ -1,45 +1,45 @@
 #!/bin/bash
 
-# Check for a valid number of parameters or for the help command
-if [ "$1" == '--help' -o "$#" != 2 ]; then
-	printf "The usage for this command is:\n"
-	printf "\tdomaindef.sh '\e[33mip_address:80\e[0m' '\e[32msite_name\e[0m'\n"
-	printf "Where the variables are:\n"
-	printf "\t\e[33mip_address\e[0m\tThe address of the server\n"
-	printf "\t\e[32msite_name\e[0m\tThe name of the site to add\n"
-	exit 0
+# $1:server_tag, $2:server_name, $3:server_port
+
+SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
+WEB_ROOT_DIR="web"
+SHELL="/sbin/nologin"
+HOME="/var/www/WebPanel"
+
+HOME=${HOME%/}
+if [[ $HOME == "" ]]; then
+	echo "Home directory can't be '/' itself."
+	exit 1
 fi
 
 # Allow only root execution
-if [ $(id -u) -ne 0 ]; then
+if (( $(id -u) != 0 )); then
     echo "This script requires root privileges"
     exit 1
 fi
 
-HOME="/var/www/WebPanel"
-WEBROOTDIR="web"
-SHELL="/sbin/nologin"
-SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
+SERVER_TAG=$(echo "$1" | tr '[A-Z]' '[a-z]')
+SERVER_NAME=$(echo "$2" | tr '[A-Z]' '[a-z]')
+SERVER_PORT=$(echo "$3" | tr '[A-Z]' '[a-z]')
 
-IP_PORT="$1"
-
-if ! (echo "$IP_PORT" | grep -Pq "^(\d{1,3}\.){3}\d{1,3}:\d{2,5}$") then
-	echo "IP_PORT ($IP_PORT) doesn't seem to be valid. Aborting...."
+if [[ ! (echo "$SERVER_TAG" | grep -Pqs "^web\d{3}$" ]]; then
+	echo "SERVER_TAG ($SERVER_TAG) is invalid."
 	exit 1
 fi
 
-SERVER_NAME=$(echo $2 | tr '[A-Z]' '[a-z]')
-
-if ! (echo "$SERVER_NAME" | grep -Eq "^([a-z0-9][-a-z0-9]*\.)+[a-z]+$") then
-	echo "SERVER_NAME ($SERVER_NAME) doesn't seem to be valid. Aborting...."
+if [[ ! (echo "$SERVER_NAME" | grep -Pqs "^([a-z0-9][-a-z0-9]*\.)+[a-z]+$") ]]; then
+	echo "SERVER_NAME ($SERVER_NAME) is invalid."
 	exit 1
 fi
 
-SAFE_SERVER_NAME="${SERVER_NAME//./_}"
-SAFE_SERVER_NAME="$(echo $SAFE_SERVER_NAME | cut -c1-30)" # truncate to 30 chars, so after adding u- it doesn't go beyond 32 char limit.
+if [[ ! (echo "$SERVER_PORT" | grep -Pqs "^\d+$") ]]; then
+	echo "SERVER_PORT ($SERVER_PORT) is invalid."
+	exit 1
+fi
 
 # check if ftp home already exists
-if [ ! -e "$HOME/$SERVER_NAME" ]; then
+if [[ ! -e "$HOME/$SERVER_TAG" ]]; then
 
 	# creating ftp home
 	echo "Creating ftp home..."
@@ -226,7 +226,7 @@ if [ ! -e "$HOME/$SERVER_NAME" ]; then
 	fi
 
 else
-	echo "Home directory ($HOME/$SERVER_NAME) already exists. Aborting..."
+	echo "Directory ($HOME/$SERVER_TAG) already exists."
 	exit 1
 fi
 
