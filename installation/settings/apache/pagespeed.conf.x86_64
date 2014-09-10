@@ -133,10 +133,10 @@
 
     # Other defaults (cache sizes and thresholds):
     #
-    # ModPagespeedFileCacheSizeKb          102400
-    # ModPagespeedFileCacheCleanIntervalMs 3600000
-    # ModPagespeedLRUCacheKbPerProcess     1024
-    # ModPagespeedLRUCacheByteLimit        16384
+    ModPagespeedFileCacheSizeKb          204800
+    ModPagespeedFileCacheCleanIntervalMs 3600000
+    ModPagespeedLRUCacheKbPerProcess     2048
+    ModPagespeedLRUCacheByteLimit        16384
     # ModPagespeedCssFlattenMaxBytes       2048
     # ModPagespeedCssInlineMaxBytes        2048
     # ModPagespeedCssImageInlineMaxBytes   0
