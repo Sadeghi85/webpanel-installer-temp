@@ -19,7 +19,7 @@ fi
 SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
 HOME="/var/www/WebPanel"
 
-SERVER_NAME="$(echo $1 | tr '[A-Z]' '[a-z]')"
+SERVER_TAG="$(echo $1 | tr '[A-Z]' '[a-z]')"
 
 if ! (echo "$SERVER_NAME" | grep -Eq "^([a-z0-9][-a-z0-9]*\.)*[a-z]*$") then
 	echo "SERVER_NAME ($SERVER_NAME) doesn't seem to be valid. Aborting...."
