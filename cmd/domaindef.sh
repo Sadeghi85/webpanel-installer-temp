@@ -39,37 +39,41 @@ if [[ ! (echo "$SERVER_PORT" | grep -Pqs "^\d+$") ]]; then
 fi
 
 # check if ftp home already exists
-if [[ ! -e "$HOME/$SERVER_TAG" ]]; then
+if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 
 	# creating ftp home
-	echo "Creating ftp home..."
-	STATUS=$(mkdir -p "$HOME/$SERVER_NAME" 2>&1)
+	STATUS=$(mkdir -p "$HOME/sites-available/$SERVER_TAG" 2>&1)
 	
-	if [ $? != 0 ]; then
-		echo "Couldn't create the ftp home directory. Aborting.... message:($STATUS)"
+	if (( $? != 0 )); then
+		echo "$STATUS"
 		exit 1
 	fi
 
 	# creating web root
-	echo "Creating web root..."
-	STATUS=$(mkdir -p "$HOME/$SERVER_NAME/$WEBROOTDIR" 2>&1)
+	STATUS=$(mkdir -p "$HOME/sites-available/$SERVER_TAG/$WEB_ROOT_DIR" 2>&1)
 	
-	if [ $? != 0 ]; then
-		echo "Couldn't create the web root directory. Aborting.... message:($STATUS)"
+	if (( $? != 0 )); then
+		echo "$STATUS"
 		exit 1
 	fi
 
 	# creating user
-	echo "Creating user..."
-	STATUS=$(id "u-$SAFE_SERVER_NAME" 2>&1)
+	STATUS=$(id "$SERVER_TAG" 2>&1)
 	
-	if [ $? == 0 ]; then
-		echo "WARNING: The user already exists. message:($STATUS)"
-	else
-		STATUS=$(useradd "u-$SAFE_SERVER_NAME" --home "$HOME/$SERVER_NAME" --shell "$SHELL" 2>&1)
+	if (( $? == 0 )); then
+		# user exists
+		STATUS=$(usermod "$SERVER_TAG" --home "$HOME/sites-available/$SERVER_TAG" --shell "$SHELL" 2>&1)
 		
-		if [ $? != 0 ]; then
-			echo "Couldn't create the user. Aborting.... message:($STATUS)"
+		if (( $? != 0 )); then
+			echo "$STATUS"
+			exit 1
+		fi
+	else
+		# user doesn't exist
+		STATUS=$(useradd "$SERVER_TAG" --home "$HOME/sites-available/$SERVER_TAG" --shell "$SHELL" 2>&1)
+		
+		if (( $? != 0 )); then
+			echo "$STATUS"
 			exit 1
 		fi
 	fi
@@ -180,14 +184,14 @@ if [[ ! -e "$HOME/$SERVER_TAG" ]]; then
 
 	# copying default index page
 	echo "Copying default index page..."
-	STATUS=$(cp "$SCRIPT_DIR/templates/web/index.php" "$HOME/$SERVER_NAME/$WEBROOTDIR/index.php" 2>&1)
+	STATUS=$(cp "$SCRIPT_DIR/templates/web/index.php" "$HOME/$SERVER_NAME/$WEB_ROOT_DIR/index.php" 2>&1)
 	
 	if [ $? != 0 ]; then
 		echo "WARNING: Couldn't copy the default index page. message:($STATUS)"
 	else
-		STATUS=$(sed -i -e"s/example\.com/$SERVER_NAME/g" "$HOME/$SERVER_NAME/$WEBROOTDIR/index.php" 2>&1)
-		STATUS=$(chown "u-$SAFE_SERVER_NAME:u-$SAFE_SERVER_NAME" "$HOME/$SERVER_NAME/$WEBROOTDIR/index.php" 2>&1)
-		STATUS=$(chmod 644 "$HOME/$SERVER_NAME/$WEBROOTDIR/index.php" 2>&1)
+		STATUS=$(sed -i -e"s/example\.com/$SERVER_NAME/g" "$HOME/$SERVER_NAME/$WEB_ROOT_DIR/index.php" 2>&1)
+		STATUS=$(chown "u-$SAFE_SERVER_NAME:u-$SAFE_SERVER_NAME" "$HOME/$SERVER_NAME/$WEB_ROOT_DIR/index.php" 2>&1)
+		STATUS=$(chmod 644 "$HOME/$SERVER_NAME/$WEB_ROOT_DIR/index.php" 2>&1)
 	fi
 	
 	# creating webalizer config

@@ -89,7 +89,7 @@ do
 		QUOTA_DIR="/"
 	fi
 	
-	if [[ grep -qs " $QUOTA_DIR " /proc/mounts ]]; then
+	if grep -qs " $QUOTA_DIR " /proc/mounts; then
 		QUOTA_DIR_ESC=$(sed 's/[\*\.&\/]/\\&/g' <<<"$QUOTA_DIR")
 		sed -i -r -e"s/( $QUOTA_DIR_ESC .*?defaults)/\1,usrjquota=aquota\.user,grpjquota=aquota\.group,jqfmt=vfsv0/I" /etc/fstab
 		mount -o remount "$QUOTA_DIR" 1>/dev/null
