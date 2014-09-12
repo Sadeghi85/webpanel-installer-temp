@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGS_FOLDER="/opt/webpanel/wpdata/logs"
+LOGS_DIRECTORY="/opt/webpanel/wpdata/logs"
 
 TIME=$(date +%F-%H-%M-%S)
 YEAR=$(echo "$TIME" | cut -d '-' -f 1)
@@ -15,9 +15,9 @@ for LOG in /var/log/httpd/*_access.log
 do
 	TAG=$(echo "$LOG" | cut -d '/' -f 5 | cut -d '_' -f 1)
 	
-	if [ "$TAG" != "*" ]; then
-		BY_DATE="$LOGS_FOLDER/by_date/$YEAR/$MONTH/$DAY/$TAG"
-		BY_SITE="$LOGS_FOLDER/by_site/$TAG/$YEAR/$MONTH/$DAY"
+	if [[ "$TAG" != "*" ]]; then
+		BY_DATE="$LOGS_DIRECTORY/by_date/$YEAR/$MONTH/$DAY/$TAG"
+		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
 		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_apache_access.log" 2>&1)
@@ -30,9 +30,9 @@ for LOG in /var/log/httpd/*_error.log
 do
 	TAG=$(echo "$LOG" | cut -d '/' -f 5 | cut -d '_' -f 1)
 	
-	if [ "$TAG" != "*" ]; then
-		BY_DATE="$LOGS_FOLDER/by_date/$YEAR/$MONTH/$DAY/$TAG"
-		BY_SITE="$LOGS_FOLDER/by_site/$TAG/$YEAR/$MONTH/$DAY"
+	if [[ "$TAG" != "*" ]]; then
+		BY_DATE="$LOGS_DIRECTORY/by_date/$YEAR/$MONTH/$DAY/$TAG"
+		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
 		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_apache_error.log" 2>&1)
@@ -45,9 +45,9 @@ for LOG in /var/log/nginx/*_access.log
 do
 	TAG=$(echo "$LOG" | cut -d '/' -f 5 | cut -d '_' -f 1)
 	
-	if [ "$TAG" != "*" ]; then
-		BY_DATE="$LOGS_FOLDER/by_date/$YEAR/$MONTH/$DAY/$TAG"
-		BY_SITE="$LOGS_FOLDER/by_site/$TAG/$YEAR/$MONTH/$DAY"
+	if [[ "$TAG" != "*" ]]; then
+		BY_DATE="$LOGS_DIRECTORY/by_date/$YEAR/$MONTH/$DAY/$TAG"
+		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
 		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_nginx_access.log" 2>&1)
@@ -60,9 +60,9 @@ for LOG in /var/log/nginx/*_error.log
 do
 	TAG=$(echo "$LOG" | cut -d '/' -f 5 | cut -d '_' -f 1)
 	
-	if [ "$TAG" != "*" ]; then
-		BY_DATE="$LOGS_FOLDER/by_date/$YEAR/$MONTH/$DAY/$TAG"
-		BY_SITE="$LOGS_FOLDER/by_site/$TAG/$YEAR/$MONTH/$DAY"
+	if [[ "$TAG" != "*" ]]; then
+		BY_DATE="$LOGS_DIRECTORY/by_date/$YEAR/$MONTH/$DAY/$TAG"
+		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
 		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_nginx_error.log" 2>&1)
@@ -70,14 +70,14 @@ do
 	fi
 done
 
-# PHP access log
+# PHP-FPM access log
 for LOG in /var/log/php-fpm/*_access.log
 do
 	TAG=$(echo "$LOG" | cut -d '/' -f 5 | cut -d '_' -f 1)
 	
-	if [ "$TAG" != "*" ]; then
-		BY_DATE="$LOGS_FOLDER/by_date/$YEAR/$MONTH/$DAY/$TAG"
-		BY_SITE="$LOGS_FOLDER/by_site/$TAG/$YEAR/$MONTH/$DAY"
+	if [[ "$TAG" != "*" ]]; then
+		BY_DATE="$LOGS_DIRECTORY/by_date/$YEAR/$MONTH/$DAY/$TAG"
+		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
 		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_access.log" 2>&1)
@@ -85,14 +85,14 @@ do
 	fi
 done
 
-# PHP error log
+# PHP-FPM error log
 for LOG in /var/log/php-fpm/*_error.log
 do
 	TAG=$(echo "$LOG" | cut -d '/' -f 5 | cut -d '_' -f 1)
 	
-	if [ "$TAG" != "*" ]; then
-		BY_DATE="$LOGS_FOLDER/by_date/$YEAR/$MONTH/$DAY/$TAG"
-		BY_SITE="$LOGS_FOLDER/by_site/$TAG/$YEAR/$MONTH/$DAY"
+	if [[ "$TAG" != "*" ]]; then
+		BY_DATE="$LOGS_DIRECTORY/by_date/$YEAR/$MONTH/$DAY/$TAG"
+		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
 		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_error.log" 2>&1)
@@ -100,14 +100,14 @@ do
 	fi
 done
 
-# PHP slow log
+# PHP-FPM slow log
 for LOG in /var/log/php-fpm/*_slow.log
 do
 	TAG=$(echo "$LOG" | cut -d '/' -f 5 | cut -d '_' -f 1)
 	
-	if [ "$TAG" != "*" ]; then
-		BY_DATE="$LOGS_FOLDER/by_date/$YEAR/$MONTH/$DAY/$TAG"
-		BY_SITE="$LOGS_FOLDER/by_site/$TAG/$YEAR/$MONTH/$DAY"
+	if [[ "$TAG" != "*" ]]; then
+		BY_DATE="$LOGS_DIRECTORY/by_date/$YEAR/$MONTH/$DAY/$TAG"
+		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
 		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_slow.log" 2>&1)

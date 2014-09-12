@@ -224,7 +224,6 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 	fi
 
 	# Reloading servers
-	STATUS=$(sh "$SCRIPT_DIR/start_servers.sh" 2>&1) # in case some servers aren't already up
 	STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
 	
 	if (( $? != 0 )); then

@@ -1,51 +1,54 @@
 #!/bin/bash
 
-# Check for a valid number of parameters or for the help command
-if [ "$1" == '--help' -o "$#" != 1 ]; then
-	printf "The usage for this command is:\n"
-	printf "\tdomainen.sh '\e[32msite_name\e[0m'\n"
-	printf "\t\e[32msite_name\e[0m\tThe name of the site\n"
-	exit 0
-fi
+# $1:server_tag, $2:server_name, $3:server_port
+
+SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
 
 # Allow only root execution
-if [ $(id -u) -ne 0 ]; then
+if (( $(id -u) != 0 )); then
     echo "This script requires root privileges"
     exit 1
 fi
 
-SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
+SERVER_TAG=$(echo "$1" | tr '[A-Z]' '[a-z]')
+SERVER_NAME=$(echo "$2" | tr '[A-Z]' '[a-z]')
+SERVER_PORT="$3"
 
-SERVER_NAME=$(echo $1 | tr '[A-Z]' '[a-z]')
-
-if ! (echo "$SERVER_NAME" | grep -Eq "^([a-z0-9][-a-z0-9]*\.)+[a-z]+$") then
-	echo "SERVER_NAME ($SERVER_NAME) doesn't seem to be valid. Aborting...."
+if ! $(echo "$SERVER_TAG" | grep -Pqs "^web\d{3}$"); then
+	echo "SERVER_TAG ($SERVER_TAG) is invalid."
 	exit 1
 fi
 
-echo "Enabling domain: $SERVER_NAME"
-
-# enabling php-fpm config
-STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/php-fpm.d/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
-
-# enabling apache config
-STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/httpd/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
-
-# enabling nginx config
-STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/nginx/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
-
-# enabling webalizer config
-STATUS=$(ln -fs "../sites-available/$SERVER_NAME.conf" "/etc/webalizer.d/settings/sites-enabled/$SERVER_NAME.conf" 2>&1)
-
-# Restarting servers
-echo "Restarting servers..."
-STATUS=$(sh "$SCRIPT_DIR/restart_servers.sh" 2>&1)
-
-if [ $? != 0 ]; then
-	echo -e "$STATUS\nRestart failed..."
+if ! $(echo "$SERVER_NAME" | grep -Pqs "^([a-z0-9][-a-z0-9]*\.)+[a-z]+$"); then
+	echo "SERVER_NAME ($SERVER_NAME) is invalid."
 	exit 1
-else
+fi
+
+if ! $(echo "$SERVER_PORT" | grep -Pqs "^\d+$"); then
+	echo "SERVER_PORT ($SERVER_PORT) is invalid."
+	exit 1
+fi
+
+## enabling config files
+# php-fpm
+STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+# apache
+STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+# nginx
+STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+# webalizer
+STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+
+# Reloading servers
+STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
+
+if (( $? != 0 )); then
 	echo "$STATUS"
+	exit 1
 fi
 
 exit 0
