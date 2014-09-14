@@ -2,11 +2,11 @@
 
 $welcome = <<<EOT
 <!DOCTYPE html>
-<head><title>Welcome!</title></head>
+<html><head><title>Welcome!</title></head>
 <body>
-	<h2>This is the default page for example.com:80</h2>
-</body>
-</html>
+	<p style="padding: 90px; font-size:24px; font-family: Verdana;">This is the default page for <u><span style="color:blue;">example.com:80</span></u></p>
+
+</body></html>
 EOT;
 
 echo $welcome;

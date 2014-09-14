@@ -155,7 +155,7 @@ mkdir -p /etc/php-fpm.d/settings/sites-available-for-humans
 mkdir -p /etc/php-fpm.d/settings/sites-enabled-for-humans
 
 \cp /etc/php-fpm.d/www.conf /etc/php-fpm.d/www.conf.bak
-\cp "$SCRIPT_DIR/settings/php-fpm/server.conf" /etc/php-fpm.d/www.conf
+\cp "$SCRIPT_DIR/settings/php-fpm/server.conf" /etc/php-fpm.d/server.conf
 
 \cp /etc/php-fpm.conf /etc/php-fpm.conf.bak
 \cp "$SCRIPT_DIR/settings/php-fpm/php-fpm.conf" /etc/php-fpm.conf
@@ -223,10 +223,11 @@ chkconfig mysqld on
 chkconfig nginx on
 chkconfig php-fpm on
 
-service httpd restart
-service memcached restart
-service mysqld restart
-service nginx restart
+service httpd start
+service memcached start
+service mysqld start
+service nginx start
+service php-fpm start
 
 #mysql_secure_installation
 mysql -u root <<EOF
