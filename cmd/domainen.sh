@@ -3,6 +3,13 @@
 # $1:server_tag, $2:server_name, $3:server_port
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd -P)
+HOME="/var/www/WebPanel"
+
+HOME=${HOME%/}
+if [[ $HOME == "" ]]; then
+	echo "Home directory can't be '/' itself."
+	exit 1
+fi
 
 # Allow only root execution
 if (( $(id -u) != 0 )); then
@@ -42,6 +49,10 @@ STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites
 # webalizer
 STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
 STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+
+# web
+STATUS=$(ln -fs "../sites-available/$SERVER_TAG/" "$HOME/sites-enabled/$SERVER_TAG" 2>&1)
+STATUS=$(ln -fs "../sites-available/$SERVER_TAG/" "$HOME/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME" 2>&1)
 
 # Reloading servers
 STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
