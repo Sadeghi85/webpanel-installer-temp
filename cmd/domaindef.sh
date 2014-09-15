@@ -43,16 +43,16 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 
 	# creating ftp home & web root
 	STATUS=$(mkdir -p "$HOME/sites-available/$SERVER_TAG/$WEB_ROOT_DIR" 2>&1)
-	
 	if (( $? != 0 )); then
 		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 		exit 1
 	fi
 
 	STATUS=$(ln -fs "../sites-available/$SERVER_TAG/" "$HOME/sites-enabled/$SERVER_TAG" 2>&1)
-	
 	if (( $? != 0 )); then
 		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 		exit 1
 	fi
 	
@@ -61,33 +61,37 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 
 	# creating user
 	STATUS=$(id "$SERVER_TAG" 2>&1)
-	
 	if (( $? == 0 )); then
 		# user exists
 		STATUS=$(usermod --comment "$SERVER_NAME $SERVER_PORT" -g apache --home "$HOME/sites-available/$SERVER_TAG" --shell "$SHELL" "$SERVER_TAG" 2>&1)
-		
 		if (( $? != 0 )); then
 			echo "$STATUS"
+			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 			exit 1
 		fi
 	else
 		# user doesn't exist
 		STATUS=$(useradd --comment "$SERVER_NAME $SERVER_PORT" -g apache --home "$HOME/sites-available/$SERVER_TAG" --shell "$SHELL" "$SERVER_TAG" 2>&1)
-		
 		if (( $? != 0 )); then
 			echo "$STATUS"
+			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 			exit 1
 		fi
 	fi
 	
 	# copying default index page
-	STATUS=$(cp "$SCRIPT_DIR/templates/web/index.php" "$HOME/sites-available/$SERVER_TAG/$WEB_ROOT_DIR/index.php" 2>&1)
-	
+	STATUS=$(\cp "$SCRIPT_DIR/templates/web/index.php" "$HOME/sites-available/$SERVER_TAG/$WEB_ROOT_DIR/index.php" 2>&1)
 	if (( $? != 0 )); then
 		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 		exit 1
 	else
 		STATUS=$(sed -i -e"s/example\.com:80/$SERVER_NAME:$SERVER_PORT/g" "$HOME/sites-available/$SERVER_TAG/$WEB_ROOT_DIR/index.php" 2>&1)
+		if (( $? != 0 )); then
+			echo "$STATUS"
+			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+			exit 1
+		fi
 	fi
 
 	# correcting permissions on ftp home
@@ -95,142 +99,133 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 	STATUS=$(chmod -R 644 "$HOME/sites-available/$SERVER_TAG" 2>&1)
 	STATUS=$(chmod -R +X "$HOME/sites-available/$SERVER_TAG" 2>&1) # to give search bit to all directories, effectively 755 for dirs
 	
-	# creating PHP-FPM pool definition
-	if [[ ! -f "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" ]]; then
-		# config file doesn't exist
-		STATUS=$(cp "$SCRIPT_DIR/templates/php-fpm/web001.conf" "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-		
-		if (( $? != 0 )); then
-			echo "$STATUS"
-			exit 1
-		else
-			STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-			
-			if (( $? != 0 )); then
-				echo "$STATUS"
-				exit 1
-			else
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-			
-				if (( $? != 0 )); then
-					echo "$STATUS"
-					exit 1
-				fi
-				
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-			fi
-		fi
-	else
-		# config file exists
-		echo ""
-	fi
-
-	# creating apache virtual host
-	if [[ ! -f "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" ]]; then
-		# config file doesn't exist
-		STATUS=$(cp "$SCRIPT_DIR/templates/apache/web001.conf" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-		
-		if (( $? != 0 )); then
-			echo "$STATUS"
-			exit 1
-		else
-			STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" -e"s/ServerName .*/ServerName $SERVER_PORT.$SERVER_NAME:$SERVER_PORT/" -e"s/ServerAlias .*/ServerAlias $SERVER_PORT.www.$SERVER_NAME:$SERVER_PORT/" -e"s/ServerAdmin .*/ServerAdmin postmaster@$SERVER_NAME/" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-			
-			if (( $? != 0 )); then
-				echo "$STATUS"
-				exit 1
-			else
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-			
-				if (( $? != 0 )); then
-					echo "$STATUS"
-					exit 1
-				fi
-				
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-			fi
-		fi
-	else
-		# config file exists
-		echo ""
-	fi
-
-	# creating nginx virtual host
-	if [[ ! -f "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" ]]; then
-		# config file doesn't exist
-		STATUS=$(cp "$SCRIPT_DIR/templates/nginx/web001.conf" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-		
-		if (( $? != 0 )); then
-			echo "$STATUS"
-			exit 1
-		else
-			STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" -e"s/server_name .*/server_name $SERVER_NAME www.$SERVER_NAME;/" -e"s/listen .*/listen $SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-			
-			if (( $? != 0 )); then
-				echo "$STATUS"
-				exit 1
-			else
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-			
-				if (( $? != 0 )); then
-					echo "$STATUS"
-					exit 1
-				fi
-				
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-			fi
-			
-			if ! $(grep -Pqs "listen\s+$SERVER_PORT" "/etc/nginx/nginx_default_server.conf"); then
-				if (( $SERVER_PORT != 80 )); then
-					STATUS=$(sed -i -e"s/\(listen .*80 .*default_server;\)/\1 listen $SERVER_PORT default_server;/" "/etc/nginx/nginx_default_server.conf" 2>&1)
-				fi
-			fi
-			
-		fi
-	else
-		# config file exists
-		echo ""
-	fi
+	##################### creating PHP-FPM pool definition
+	\cp "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf.bak"
 	
-	# creating webalizer config
-	if [[ ! -f "/etc/webalizer.d/sites-available/$SERVER_NAME.conf" ]]; then
-		# config file doesn't exist
-		STATUS=$(cp "$SCRIPT_DIR/templates/webalizer/web001.conf" "/etc/webalizer.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-		
-		if (( $? != 0 )); then
-			echo "$STATUS"
-		else
-			STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" "/etc/webalizer.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-			
-			if (( $? != 0 )); then
-				echo "$STATUS"
-			else
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-			
-				if (( $? != 0 )); then
-					echo "$STATUS"
-				fi
-				
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-				STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-			fi
-		fi
-	else
-		# config file exists
-		echo ""
-	fi
-
-	# Reloading servers
-	STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
-	
+	STATUS=$(\cp "$SCRIPT_DIR/templates/php-fpm/web001.conf" "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 	if (( $? != 0 )); then
 		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+		exit 1
+	else
+		STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+		if (( $? != 0 )); then
+			echo "$STATUS"
+			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+			exit 1
+		fi
+	fi
+	
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	if (( $? != 0 )); then
+		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 		exit 1
 	fi
+	
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
 
+	##################### creating apache virtual host
+	\cp "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf.bak"
+	
+	STATUS=$(\cp "$SCRIPT_DIR/templates/apache/web001.conf" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+	if (( $? != 0 )); then
+		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+		exit 1
+	else
+		STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" -e"s/ServerName .*/ServerName $SERVER_PORT.$SERVER_NAME:$SERVER_PORT/" -e"s/ServerAlias .*/ServerAlias $SERVER_PORT.www.$SERVER_NAME:$SERVER_PORT/" -e"s/ServerAdmin .*/ServerAdmin postmaster@$SERVER_NAME/" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+		if (( $? != 0 )); then
+			echo "$STATUS"
+			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+			exit 1
+		fi
+	fi
+
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	if (( $? != 0 )); then
+		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+		exit 1
+	fi
+	
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+
+	##################### creating nginx virtual host
+	\cp "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf.bak"
+	
+	STATUS=$(\cp "$SCRIPT_DIR/templates/nginx/web001.conf" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+	if (( $? != 0 )); then
+		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+		exit 1
+	else
+		STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" -e"s/server_name .*/server_name $SERVER_NAME www.$SERVER_NAME;/" -e"s/listen .*/listen $SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+		if (( $? != 0 )); then
+			echo "$STATUS"
+			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+			exit 1
+		fi
+		
+		if ! $(grep -Pqs "listen\s+$SERVER_PORT" "/etc/nginx/nginx_default_server.conf"); then
+			if (( $SERVER_PORT != 80 )); then
+				STATUS=$(sed -i -e"s/\(listen .*80 .*default_server;\)/\1 listen $SERVER_PORT default_server;/" "/etc/nginx/nginx_default_server.conf" 2>&1)
+				if (( $? != 0 )); then
+					echo "$STATUS"
+					STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+					exit 1
+				fi
+			fi
+		fi
+		
+	fi
+	
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	if (( $? != 0 )); then
+		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+		exit 1
+	fi
+	
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+	
+	##################### creating webalizer config
+	\cp "/etc/webalizer.d/sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/sites-available/$SERVER_TAG.conf.bak"
+
+	STATUS=$(\cp "$SCRIPT_DIR/templates/webalizer/web001.conf" "/etc/webalizer.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+	if (( $? != 0 )); then
+		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+		exit 1
+	else
+		STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" "/etc/webalizer.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+		if (( $? != 0 )); then
+			echo "$STATUS"
+			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+			exit 1
+		fi
+	fi
+	
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	if (( $? != 0 )); then
+		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+		exit 1
+	fi
+	
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+
+	##################### Reloading servers
+	STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
+	if (( $? != 0 )); then
+		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+		exit 1
+	fi
 else
 	echo "Directory ($HOME/sites-available/$SERVER_TAG) already exists."
 	exit 1

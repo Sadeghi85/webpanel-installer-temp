@@ -38,31 +38,38 @@ fi
 
 ## disabling config files
 # php-fpm
-STATUS=$(rm -f "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-STATUS=$(rm -f "/etc/php-fpm.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-
+STATUS=$(mv "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf.bak" 2>&1)
 # apache
-STATUS=$(rm -f "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-STATUS=$(rm -f "/etc/httpd/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-
+STATUS=$(mv "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf" "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf.bak" 2>&1)
 # nginx
-STATUS=$(rm -f "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-STATUS=$(rm -f "/etc/nginx/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-
+STATUS=$(mv "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf" "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf.bak" 2>&1)
 # webalizer
-STATUS=$(rm -f "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-STATUS=$(rm -f "/etc/webalizer.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
-
+STATUS=$(mv "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf.bak" 2>&1)
 # web
-STATUS=$(rm -f "$HOME/sites-enabled/$SERVER_TAG" 2>&1)
-STATUS=$(rm -f "$HOME/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME" 2>&1)
+STATUS=$(mv "$HOME/sites-enabled/$SERVER_TAG" "$HOME/sites-enabled/$SERVER_TAG.bak" 2>&1)
 
-# Reloading servers
 STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
-
 if (( $? != 0 )); then
 	echo "$STATUS"
+	STATUS=$(mv "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	STATUS=$(mv "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	STATUS=$(mv "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	STATUS=$(mv "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	STATUS=$(mv "$HOME/sites-enabled/$SERVER_TAG.bak" "$HOME/sites-enabled/$SERVER_TAG" 2>&1)
+	
 	exit 1
+else
+	STATUS=$(rm -f "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf.bak" 2>&1)
+	STATUS=$(rm -f "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf.bak" 2>&1)
+	STATUS=$(rm -f "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf.bak" 2>&1)
+	STATUS=$(rm -f "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf.bak" 2>&1)
+	STATUS=$(rm -f "$HOME/sites-enabled/$SERVER_TAG.bak" 2>&1)
+	
+	STATUS=$(rm -f "/etc/php-fpm.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+	STATUS=$(rm -f "/etc/httpd/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+	STATUS=$(rm -f "/etc/nginx/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+	STATUS=$(rm -f "/etc/webalizer.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+	STATUS=$(rm -f "$HOME/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME" 2>&1)
 fi
 
 exit 0

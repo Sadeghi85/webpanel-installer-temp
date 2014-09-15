@@ -50,7 +50,6 @@ done
 
 # setting quota size
 STATUS=$(setquota -u "$SERVER_TAG" -F vfsv0 0 "$QUOTA_SIZE" 0 0 "$QUOTA_DIR" -a 2>&1)
-
 if (( $? != 0 )); then
 	echo "$STATUS"
 	exit 1

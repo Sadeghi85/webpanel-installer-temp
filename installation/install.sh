@@ -239,8 +239,7 @@ DROP DATABASE test;
 FLUSH PRIVILEGES;
 EOF
 
+yum -y update
+
 touch /etc/default/webpanel
-
-#yum -y update
-
 echo "WebPanel is installed"
