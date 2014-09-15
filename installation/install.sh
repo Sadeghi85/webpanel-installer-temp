@@ -223,11 +223,11 @@ chkconfig mysqld on
 chkconfig nginx on
 chkconfig php-fpm on
 
-service httpd start
-service memcached start
-service mysqld start
-service nginx start
-service php-fpm start
+service httpd restart
+service memcached restart
+service mysqld restart
+service nginx restart
+service php-fpm restart
 
 #mysql_secure_installation
 mysql -u root <<EOF
