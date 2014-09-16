@@ -133,7 +133,7 @@
 
     # Other defaults (cache sizes and thresholds):
     #
-	ModPagespeedFileCacheSizeKb          204800
+    ModPagespeedFileCacheSizeKb          204800
     ModPagespeedFileCacheCleanIntervalMs 3600000
     ModPagespeedLRUCacheKbPerProcess     2048
     ModPagespeedLRUCacheByteLimit        16384
@@ -326,7 +326,7 @@
 
     # Uncomment the following line if you want to disable statistics entirely.
     #
-    ModPagespeedStatistics off
+    ModPagespeedStatistics on
 
     # These handlers are central entry-points into the admin pages.
     # By default, pagespeed_admin and pagespeed_global_admin present
@@ -341,21 +341,21 @@
     # file, to allow any client that can reach your server to access
     # and change server state, such as statistics, caches, and
     # messages.  This might be appropriate in an experimental setup.
-    #<Location /pagespeed_admin>
-    #    Order allow,deny
-    #    Allow from localhost
-    #    Allow from 127.0.0.1
-    #    SetHandler pagespeed_admin
-    #</Location>
-    #<Location /pagespeed_global_admin>
-    #    Order allow,deny
-    #    Allow from localhost
-    #    Allow from 127.0.0.1
-    #    SetHandler pagespeed_global_admin
-    #</Location>
+    <Location /pagespeed_admin>
+        Order allow,deny
+        Allow from localhost
+        Allow from 127.0.0.1
+        SetHandler pagespeed_admin
+    </Location>
+    <Location /pagespeed_global_admin>
+        Order allow,deny
+        Allow from localhost
+        Allow from 127.0.0.1
+        SetHandler pagespeed_global_admin
+    </Location>
 
     # Enable logging of mod_pagespeed statistics, needed for the console.
-    #ModPagespeedStatisticsLogging on
+    ModPagespeedStatisticsLogging on
 
     # Page /mod_pagespeed_message lets you view the latest messages from
     # mod_pagespeed, regardless of log-level in your httpd.conf
@@ -363,6 +363,5 @@
     # like to dump to your /mod_pagespeed_message page at one time,
     # its default value is 100k bytes.
     # Set it to 0 if you want to disable this feature.
-    #ModPagespeedMessageBufferSize 100000
-	ModPagespeedMessageBufferSize 0
+    ModPagespeedMessageBufferSize 100000
 </IfModule>
