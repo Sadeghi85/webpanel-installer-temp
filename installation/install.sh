@@ -75,18 +75,18 @@ yum clean all
 yum -y update
 
 ################## server configs
-\cp /etc/selinux/config /etc/selinux/config.bak
+\mv /etc/selinux/config /etc/selinux/config.bak
 \cp "$SCRIPT_DIR/settings/selinux/config" /etc/selinux/config
 
-\cp /etc/yum.conf /etc/yum.conf.bak
+\mv /etc/yum.conf /etc/yum.conf.bak
 \cp "$SCRIPT_DIR/settings/yum/yum.conf" /etc/yum.conf
 
-\cp /etc/sysconfig/yum-cron /etc/sysconfig/yum-cron.bak
+\mv /etc/sysconfig/yum-cron /etc/sysconfig/yum-cron.bak
 \cp "$SCRIPT_DIR/settings/yum-cron/yum-cron" /etc/sysconfig/yum-cron
 chkconfig yum-cron on
 service yum-cron restart
 
-\cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+\mv /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 \cp "$SCRIPT_DIR/settings/ssh/sshd_config" /etc/ssh/sshd_config
 service sshd restart
 
@@ -141,13 +141,13 @@ mkdir -p /etc/httpd/settings/sites-enabled-for-humans
 \mv /etc/httpd/conf.d/webalizer.conf /etc/httpd/conf.d/webalizer.conf.disabled
 \mv /etc/httpd/conf.d/wsgi.conf /etc/httpd/conf.d/wsgi.conf.disabled
 
-\cp /etc/sysconfig/httpd /etc/sysconfig/httpd.bak
+\mv /etc/sysconfig/httpd /etc/sysconfig/httpd.bak
 \cp "$SCRIPT_DIR/settings/apache/httpd" /etc/sysconfig/httpd
 
-\cp /etc/httpd/conf.d/fastcgi.conf /etc/httpd/conf.d/fastcgi.conf.bak
+\mv /etc/httpd/conf.d/fastcgi.conf /etc/httpd/conf.d/fastcgi.conf.bak
 \cp "$SCRIPT_DIR/settings/apache/fastcgi.conf" /etc/httpd/conf.d/fastcgi.conf
 
-\cp /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
+\mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
 \cp "$SCRIPT_DIR/settings/apache/welcome.conf" /etc/httpd/conf.d/welcome.conf
 
 \cp "$SCRIPT_DIR/settings/apache/deflate.conf.disabled" /etc/httpd/conf.d/deflate.conf.disabled
@@ -155,14 +155,14 @@ mkdir -p /etc/httpd/settings/sites-enabled-for-humans
 \cp "$SCRIPT_DIR/settings/apache/rpaf.conf" /etc/httpd/conf.d/rpaf.conf
 \cp "$SCRIPT_DIR/settings/apache/php-fpm.conf.disabled" /etc/httpd/conf.d/php-fpm.conf.disabled
 
-\cp /etc/httpd/conf.d/pagespeed.conf /etc/httpd/conf.d/pagespeed.conf.bak
+\mv /etc/httpd/conf.d/pagespeed.conf /etc/httpd/conf.d/pagespeed.conf.bak
 if [[ $ARCH == "i686" ]]; then
 	\cp "$SCRIPT_DIR/settings/apache/pagespeed.conf.i686" /etc/httpd/conf.d/pagespeed.conf
 else
 	\cp "$SCRIPT_DIR/settings/apache/pagespeed.conf.x86_64" /etc/httpd/conf.d/pagespeed.conf
 fi
 
-\cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.bak
+\mv /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.bak
 \cp "$SCRIPT_DIR/settings/apache/httpd.conf" /etc/httpd/conf/httpd.conf
 
 # PHP-FPM
@@ -172,17 +172,17 @@ mkdir -p /etc/php-fpm.d/settings/sites-enabled
 mkdir -p /etc/php-fpm.d/settings/sites-available-for-humans
 mkdir -p /etc/php-fpm.d/settings/sites-enabled-for-humans
 
-\cp /etc/php-fpm.d/www.conf /etc/php-fpm.d/www.conf.bak
+\mv /etc/php-fpm.d/www.conf /etc/php-fpm.d/www.conf.bak
 \cp "$SCRIPT_DIR/settings/php-fpm/server.conf" /etc/php-fpm.d/server.conf
 
-\cp /etc/php-fpm.conf /etc/php-fpm.conf.bak
+\mv /etc/php-fpm.conf /etc/php-fpm.conf.bak
 \cp "$SCRIPT_DIR/settings/php-fpm/php-fpm.conf" /etc/php-fpm.conf
 
 # PHP
-\cp /etc/php.ini /etc/php.ini.bak
+\mv /etc/php.ini /etc/php.ini.bak
 \cp "$SCRIPT_DIR/settings/php/php.ini" /etc/php.ini
 
-\cp /etc/php.d/opcache.ini /etc/php.d/opcache.ini.bak
+\mv /etc/php.d/opcache.ini /etc/php.d/opcache.ini.bak
 if [[ $ARCH == "i686" ]]; then
 	\cp "$SCRIPT_DIR/settings/php/opcache.ini.i686" /etc/php.d/opcache.ini
 else
@@ -190,7 +190,7 @@ else
 fi
 
 # Memcached
-\cp /etc/sysconfig/memcached /etc/sysconfig/memcached.bak
+\mv /etc/sysconfig/memcached /etc/sysconfig/memcached.bak
 \cp "$SCRIPT_DIR/settings/memcached/memcached" /etc/sysconfig/memcached
 
 # Nginx
@@ -201,7 +201,7 @@ mkdir -p /etc/nginx/settings/sites-enabled
 mkdir -p /etc/nginx/settings/sites-available-for-humans
 mkdir -p /etc/nginx/settings/sites-enabled-for-humans
 
-\cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+\mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
 \cp "$SCRIPT_DIR/settings/nginx/nginx.conf" /etc/nginx/nginx.conf
 \cp "$SCRIPT_DIR/settings/nginx/nginx_default_server.conf" /etc/nginx/nginx_default_server.conf
 
@@ -231,7 +231,7 @@ service iptables save
 service iptables restart
 
 # limits
-\cp /etc/security/limits.d/90-nproc.conf /etc/security/limits.d/90-nproc.conf.bak
+\mv /etc/security/limits.d/90-nproc.conf /etc/security/limits.d/90-nproc.conf.bak
 \cp "$SCRIPT_DIR/settings/limits/90-nproc.conf" /etc/security/limits.d/90-nproc.conf
 
 # starting Apache, Memcached, MySQL, Nginx & PHP-FPM

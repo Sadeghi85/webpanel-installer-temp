@@ -45,36 +45,36 @@ fi
 
 ## deleting *available* config files
 # php-fpm
-STATUS=$(rm -f "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(\rm -f "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 if (( $? != 0 )); then
 	echo "$STATUS"
 	exit 1
 fi
-STATUS=$(rm -f "/etc/php-fpm.d/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+STATUS=$(\rm -f "/etc/php-fpm.d/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
 
 # apache
-STATUS=$(rm -f "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(\rm -f "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 if (( $? != 0 )); then
 	echo "$STATUS"
 	exit 1
 fi
-STATUS=$(rm -f "/etc/httpd/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+STATUS=$(\rm -f "/etc/httpd/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
 
 # nginx
-STATUS=$(rm -f "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(\rm -f "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 if (( $? != 0 )); then
 	echo "$STATUS"
 	exit 1
 fi
-STATUS=$(rm -f "/etc/nginx/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+STATUS=$(\rm -f "/etc/nginx/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
 
 # webalizer
-STATUS=$(rm -f "/etc/webalizer.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(\rm -f "/etc/webalizer.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 if (( $? != 0 )); then
 	echo "$STATUS"
 	exit 1
 fi
-STATUS=$(rm -f "/etc/webalizer.d/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
+STATUS=$(\rm -f "/etc/webalizer.d/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
 
 # deleting user
 STATUS=$(userdel "$SERVER_TAG" 2>&1)

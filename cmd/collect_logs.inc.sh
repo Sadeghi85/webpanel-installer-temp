@@ -20,7 +20,7 @@ do
 		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
-		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_apache_access.log" 2>&1)
+		STATUS=$(\mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_apache_access.log" 2>&1)
 		STATUS=$(ln -fs "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_apache_access.log" "$BY_SITE/${HOUR}_${MINUTE}_${SECOND}_apache_access.log" 2>&1)
 	fi
 done
@@ -35,7 +35,7 @@ do
 		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
-		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_apache_error.log" 2>&1)
+		STATUS=$(\mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_apache_error.log" 2>&1)
 		STATUS=$(ln -fs "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_apache_error.log" "$BY_SITE/${HOUR}_${MINUTE}_${SECOND}_apache_error.log" 2>&1)
 	fi
 done
@@ -50,7 +50,7 @@ do
 		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
-		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_nginx_access.log" 2>&1)
+		STATUS=$(\mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_nginx_access.log" 2>&1)
 		STATUS=$(ln -fs "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_nginx_access.log" "$BY_SITE/${HOUR}_${MINUTE}_${SECOND}_nginx_access.log" 2>&1)
 	fi
 done
@@ -65,7 +65,7 @@ do
 		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
-		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_nginx_error.log" 2>&1)
+		STATUS=$(\mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_nginx_error.log" 2>&1)
 		STATUS=$(ln -fs "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_nginx_error.log" "$BY_SITE/${HOUR}_${MINUTE}_${SECOND}_nginx_error.log" 2>&1)
 	fi
 done
@@ -80,7 +80,7 @@ do
 		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
-		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_access.log" 2>&1)
+		STATUS=$(\mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_access.log" 2>&1)
 		STATUS=$(ln -fs "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_access.log" "$BY_SITE/${HOUR}_${MINUTE}_${SECOND}_php_access.log" 2>&1)
 	fi
 done
@@ -95,7 +95,7 @@ do
 		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
-		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_error.log" 2>&1)
+		STATUS=$(\mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_error.log" 2>&1)
 		STATUS=$(ln -fs "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_error.log" "$BY_SITE/${HOUR}_${MINUTE}_${SECOND}_php_error.log" 2>&1)
 	fi
 done
@@ -110,7 +110,7 @@ do
 		BY_SITE="$LOGS_DIRECTORY/by_site/$TAG/$YEAR/$MONTH/$DAY"
 		STATUS=$(mkdir -p "$BY_DATE" 2>&1)
 		STATUS=$(mkdir -p "$BY_SITE" 2>&1)
-		STATUS=$(mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_slow.log" 2>&1)
+		STATUS=$(\mv "$LOG" "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_slow.log" 2>&1)
 		STATUS=$(ln -fs "$BY_DATE/${HOUR}_${MINUTE}_${SECOND}_php_slow.log" "$BY_SITE/${HOUR}_${MINUTE}_${SECOND}_php_slow.log" 2>&1)
 	fi
 done

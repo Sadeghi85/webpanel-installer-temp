@@ -100,7 +100,7 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 	STATUS=$(chmod -R +X "$HOME/sites-available/$SERVER_TAG" 2>&1) # to give search bit to all directories, effectively 755 for dirs
 	
 	##################### creating PHP-FPM pool definition
-	\cp "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf.bak"
+	STATUS=$(\mv "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf.bak" 2>&1)
 	
 	STATUS=$(\cp "$SCRIPT_DIR/templates/php-fpm/web001.conf" "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 	if (( $? != 0 )); then
@@ -127,7 +127,7 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
 
 	##################### creating apache virtual host
-	\cp "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf.bak"
+	STATUS=$(\mv "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf.bak" 2>&1)
 	
 	STATUS=$(\cp "$SCRIPT_DIR/templates/apache/web001.conf" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 	if (( $? != 0 )); then
@@ -154,7 +154,7 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/httpd/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
 
 	##################### creating nginx virtual host
-	\cp "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf.bak"
+	STATUS=$(\mv "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf.bak" 2>&1)
 	
 	STATUS=$(\cp "$SCRIPT_DIR/templates/nginx/web001.conf" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 	if (( $? != 0 )); then
@@ -193,7 +193,7 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 	STATUS=$(ln -fs "../sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-enabled-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
 	
 	##################### creating webalizer config
-	\cp "/etc/webalizer.d/sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/sites-available/$SERVER_TAG.conf.bak"
+	STATUS=$(\mv "/etc/webalizer.d/settings/sites-available/$SERVER_TAG.conf" "/etc/webalizer.d/settings/sites-available/$SERVER_TAG.conf.bak" 2>&1)
 
 	STATUS=$(\cp "$SCRIPT_DIR/templates/webalizer/web001.conf" "/etc/webalizer.d/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 	if (( $? != 0 )); then

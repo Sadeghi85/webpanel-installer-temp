@@ -30,8 +30,8 @@ if (( $? != 0 )); then
 	exit 1
 fi
 
-STATUS=$(/sbin/service memcahced start 2>&1)
-STATUS=$(ps aux | grep memcahce[d] 2>&1)
+STATUS=$(/sbin/service memcached start 2>&1)
+STATUS=$(ps aux | grep memcache[d] 2>&1)
 if (( $? != 0 )); then
 	echo "$STATUS"
 	exit 1
