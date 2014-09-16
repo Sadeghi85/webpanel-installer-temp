@@ -37,7 +37,7 @@ if ! $(echo "$SERVER_PORT" | grep -Pqs "^\d+$"); then
 fi
 
 ## deleting *enabled* config files
-STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+STATUS=$("$SCRIPT_DIR/domaindis.sh" "$SERVER_TAG" "$SERVER_NAME" "$SERVER_PORT" 2>&1)
 if (( $? != 0 )); then
 	echo "$STATUS"
 	exit 1
