@@ -27,10 +27,17 @@ fi
 setenforce 0
 
 ################## unistall mysql for conflicts
-rpm -e --nodeps mysql
-rpm -e --nodeps mysql-libs
-rpm -e --nodeps mysql-server
-yum clean all
+rpm -e --nodeps $(rpm -qa | grep '^mysql')
+################## unistall memcached
+rpm -e --nodeps $(rpm -qa | grep 'memcached')
+################## unistall webalizer
+rpm -e --nodeps $(rpm -qa | grep '^webalizer')
+################## unistall php
+rpm -e --nodeps $(rpm -qa | grep '^php')
+################## unistall apache
+rpm -e --nodeps $(rpm -qa | grep '^httpd')
+################## unistall nginx
+rpm -e --nodeps $(rpm -qa | grep '^nginx')
 
 ################## repos
 \cp "$SCRIPT_DIR/repos/CentOS-Base/etc/yum.repos.d/CentOS-Base.repo" /etc/yum.repos.d/CentOS-Base.repo
@@ -49,7 +56,7 @@ yum clean all
 # yum -y install yum-plugin-priorities yum-plugin-rpm-warm-cache yum-plugin-local yum-presto yum-plugin-fastestmirror yum-plugin-replace yum-cron 	yum-plugin-remove-with-leaves yum-plugin-show-leaves yum-utils
 
 #installing packages
-# yum -y install iftop iotop bind-utils htop nmap openssh-clients memcached mysql httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-mongo php54-pecl-memcached php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx quota webalizer man net-snmp rrdtool mail rsync wget
+# yum -y install iftop iotop bind-utils htop nmap openssh-clients memcached mysql httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-memcached php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx quota webalizer man net-snmp rrdtool mail rsync wget
 
 #installing mysql55
 # yum -y replace mysql --replace-with mysql55
@@ -58,8 +65,14 @@ yum clean all
 # installing packages
 touch /etc/default/mod-pagespeed
 rpm -ivh --force $(find "$SCRIPT_DIR/packages/$ARCH" -name "*" | grep -e \.rpm$)
-# install PHP-FPM again
-rpm -ivh --force $(find "$SCRIPT_DIR/packages/$ARCH" -name "*" | grep -e php.*-fpm.*\.rpm$)
+if (( $? != 0 )); then
+	echo "Couldn't install packages."
+	exit 1
+fi
+
+# update operating system
+yum clean all
+yum -y update
 
 ################## server configs
 \cp /etc/selinux/config /etc/selinux/config.bak
@@ -122,6 +135,11 @@ mkdir -p /etc/httpd/settings/sites-available-for-humans
 mkdir -p /etc/httpd/settings/sites-enabled-for-humans
 \cp /var/www/error/noindex.html /var/www/html/index.html
 \mv /etc/httpd/conf.d/php.conf /etc/httpd/conf.d/php.conf.disabled
+\mv /etc/httpd/conf.d/perl.conf /etc/httpd/conf.d/perl.conf.disabled
+\mv /etc/httpd/conf.d/squid.conf /etc/httpd/conf.d/squid.conf.disabled
+\mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
+\mv /etc/httpd/conf.d/webalizer.conf /etc/httpd/conf.d/webalizer.conf.disabled
+\mv /etc/httpd/conf.d/wsgi.conf /etc/httpd/conf.d/wsgi.conf.disabled
 
 \cp /etc/sysconfig/httpd /etc/sysconfig/httpd.bak
 \cp "$SCRIPT_DIR/settings/apache/httpd" /etc/sysconfig/httpd
@@ -238,8 +256,6 @@ USE test;
 DROP DATABASE test;
 FLUSH PRIVILEGES;
 EOF
-
-yum -y update
 
 touch /etc/default/webpanel
 echo "WebPanel is installed"
