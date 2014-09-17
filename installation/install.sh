@@ -70,6 +70,24 @@ if (( $? != 0 )); then
 	exit 1
 fi
 
+################## rpm dupes cleanup
+timeorderedpackagelist=$(rpm -qa --last)
+olddupes=""
+allpackages=$(rpm -qa --queryformat "%-30{NAME}\n" | sort)
+baddies=$(q=""; for i in $allpackages; do if [[ $i == $q ]]; then echo $i; q=xxx; else q="$i"; fi; done)
+baddiesnokernel=$(echo "$baddies" | grep -v kernel | grep -v gpg-pubkey)
+for i in $baddiesnokernel; do
+	dupelist=$(echo "$timeorderedpackagelist" | grep ^"$i"-[0-9] | cut -d' ' -f1)
+	first=1
+	for j in $(echo "$dupelist"); do
+		if [[ -z $first ]]; then
+			olddupes="$j $olddupes"
+		fi
+		first=""
+	done
+done
+rpm -e --nodeps $(echo "$olddupes")
+
 # update operating system
 yum clean all
 yum -y update
