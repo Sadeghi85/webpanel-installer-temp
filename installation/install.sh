@@ -51,7 +51,7 @@ rpm -e --nodeps $(rpm -qa | grep '^nginx')
 \cp "$SCRIPT_DIR/repos/rpmforge/etc/yum.repos.d/rpmforge.repo" /etc/yum.repos.d/rpmforge.repo
 
 ################# yum plugins
-# yum -y install yum-plugin-priorities yum-plugin-rpm-warm-cache yum-plugin-local yum-presto yum-plugin-fastestmirror yum-plugin-replace yum-cron 	yum-plugin-remove-with-leaves yum-plugin-show-leaves yum-utils
+# yum -y install yum-plugin-priorities yum-plugin-rpm-warm-cache yum-plugin-local yum-plugin-fastestmirror yum-plugin-replace yum-cron 	yum-plugin-remove-with-leaves yum-plugin-show-leaves yum-utils
 
 #installing packages
 # yum -y install iftop iotop bind-utils htop nmap openssh-clients mysql httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx quota webalizer man net-snmp rrdtool mail rsync wget
@@ -69,11 +69,10 @@ if (( $? != 0 )); then
 fi
 
 ################## rpm dupes cleanup
-package-cleanup --cleandupes
-updatedb
+yum clean all
+package-cleanup -y --cleandupes
 
 # update operating system
-yum clean all
 yum -y update
 
 ################## server configs
