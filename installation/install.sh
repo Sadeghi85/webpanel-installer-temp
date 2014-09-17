@@ -28,8 +28,6 @@ setenforce 0
 
 ################## unistall mysql for conflicts
 rpm -e --nodeps $(rpm -qa | grep '^mysql')
-################## unistall memcached
-rpm -e --nodeps $(rpm -qa | grep 'memcached')
 ################## unistall webalizer
 rpm -e --nodeps $(rpm -qa | grep '^webalizer')
 ################## unistall php
@@ -56,7 +54,7 @@ rpm -e --nodeps $(rpm -qa | grep '^nginx')
 # yum -y install yum-plugin-priorities yum-plugin-rpm-warm-cache yum-plugin-local yum-presto yum-plugin-fastestmirror yum-plugin-replace yum-cron 	yum-plugin-remove-with-leaves yum-plugin-show-leaves yum-utils
 
 #installing packages
-# yum -y install iftop iotop bind-utils htop nmap openssh-clients memcached mysql httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-memcached php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx quota webalizer man net-snmp rrdtool mail rsync wget
+# yum -y install iftop iotop bind-utils htop nmap openssh-clients mysql httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx quota webalizer man net-snmp rrdtool mail rsync wget
 
 #installing mysql55
 # yum -y replace mysql --replace-with mysql55
@@ -193,10 +191,6 @@ else
 	\cp "$SCRIPT_DIR/settings/php/opcache.ini.x86_64" /etc/php.d/opcache.ini
 fi
 
-# Memcached
-\mv /etc/sysconfig/memcached /etc/sysconfig/memcached.bak
-\cp "$SCRIPT_DIR/settings/memcached/memcached" /etc/sysconfig/memcached
-
 # Nginx
 \mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.disabled
 \mv /etc/nginx/conf.d/example_ssl.conf /etc/nginx/conf.d/example_ssl.conf.disabled
@@ -238,15 +232,13 @@ service iptables restart
 \mv /etc/security/limits.d/90-nproc.conf /etc/security/limits.d/90-nproc.conf.bak
 \cp "$SCRIPT_DIR/settings/limits/90-nproc.conf" /etc/security/limits.d/90-nproc.conf
 
-# starting Apache, Memcached, MySQL, Nginx & PHP-FPM
+# starting Apache, MySQL, Nginx & PHP-FPM
 chkconfig httpd on
-chkconfig memcached on
 chkconfig mysqld on
 chkconfig nginx on
 chkconfig php-fpm on
 
 service httpd restart
-service memcached restart
 service mysqld restart
 service nginx restart
 service php-fpm restart
