@@ -135,6 +135,7 @@ mkdir -p /etc/httpd/settings/sites-enabled
 mkdir -p /etc/httpd/settings/sites-available-for-humans
 mkdir -p /etc/httpd/settings/sites-enabled-for-humans
 \cp /var/www/error/noindex.html /var/www/html/index.html
+\cp /usr/share/pixmaps/poweredby.png /var/www/icons/powered_by_rh.png
 \mv /etc/httpd/conf.d/php.conf /etc/httpd/conf.d/php.conf.disabled
 \mv /etc/httpd/conf.d/perl.conf /etc/httpd/conf.d/perl.conf.disabled
 \mv /etc/httpd/conf.d/squid.conf /etc/httpd/conf.d/squid.conf.disabled
@@ -251,6 +252,25 @@ USE test;
 DROP DATABASE test;
 FLUSH PRIVILEGES;
 EOF
+
+# installing panel
+tar -xzf "/opt/webpanel/lamp-$ARCH/lamp-$ARCH.tar.gz" --directory "/opt/webpanel/lamp-$ARCH"
+chmod +x $(find "/opt/webpanel/lamp-$ARCH" -name "*" | grep -e \.sh$)
+chown -R daemon:daemon "/opt/webpanel/lamp-$ARCH/mysql/data"
+
+
+mkdir -p /opt/webpanel/panel/public
+mkdir -p /opt/webpanel/panel/app/storage
+chown -R daemon:daemon /opt/webpanel/panel/public
+chown -R daemon:daemon /opt/webpanel/panel/app/storage
+
+
+
+\cp "$SCRIPT_DIR/settings/init.d/webpanel" /etc/init.d/webpanel
+chmod +x /etc/init.d/webpanel
+chkconfig --add webpanel
+chkconfig webpanel on
+service webpanel restart
 
 touch /etc/default/webpanel
 echo "WebPanel is installed"

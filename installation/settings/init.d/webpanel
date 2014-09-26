@@ -1,0 +1,22 @@
+#!/bin/bash
+# description: service webpanel start/stop/restart
+# chkconfig: 2345 20 80
+
+ARCH=$(arch)
+WEBPANEL_HOME="/opt/webpanel/lamp-$ARCH"
+
+PATH="$WEBPANEL_HOME:$PATH"
+export PATH
+
+case $1 in
+start)
+sh "$WEBPANEL_HOME/ctlscript.sh" start
+;;
+stop)   
+sh "$WEBPANEL_HOME/ctlscript.sh" stop
+;;
+restart)
+sh "$WEBPANEL_HOME/ctlscript.sh" restart
+;;
+esac    
+exit 0
