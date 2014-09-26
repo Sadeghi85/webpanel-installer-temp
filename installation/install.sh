@@ -138,6 +138,7 @@ mkdir -p /etc/httpd/settings/sites-enabled-for-humans
 \cp /usr/share/pixmaps/poweredby.png /var/www/icons/powered_by_rh.png
 \mv /etc/httpd/conf.d/php.conf /etc/httpd/conf.d/php.conf.disabled
 \mv /etc/httpd/conf.d/perl.conf /etc/httpd/conf.d/perl.conf.disabled
+\mv /etc/httpd/conf.d/ruby.conf /etc/httpd/conf.d/ruby.conf.disabled
 \mv /etc/httpd/conf.d/squid.conf /etc/httpd/conf.d/squid.conf.disabled
 \mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
 \mv /etc/httpd/conf.d/webalizer.conf /etc/httpd/conf.d/webalizer.conf.disabled
