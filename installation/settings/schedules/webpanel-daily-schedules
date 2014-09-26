@@ -1,4 +1,4 @@
 #!/bin/bash
 
 # Webalizer & Logs etc...
-sh "/opt/webpanel/cmd/daily-schedules.sh"
+sh /opt/webpanel/cmd/daily-schedules.sh

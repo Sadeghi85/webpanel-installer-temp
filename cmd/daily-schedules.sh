@@ -2,8 +2,8 @@
 
 # Allow only root execution
 if (( $(id -u) != 0 )); then
-    echo "This script requires root privileges"
-    exit 1
+	echo "This script requires root privileges"
+	exit 1
 fi
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd -P)

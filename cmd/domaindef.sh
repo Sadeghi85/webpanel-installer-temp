@@ -15,8 +15,8 @@ fi
 
 # Allow only root execution
 if (( $(id -u) != 0 )); then
-    echo "This script requires root privileges"
-    exit 1
+	echo "This script requires root privileges"
+	exit 1
 fi
 
 SERVER_TAG=$(echo "$1" | tr '[A-Z]' '[a-z]')
