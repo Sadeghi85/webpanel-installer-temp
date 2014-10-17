@@ -62,7 +62,7 @@ rpm -e --nodeps $(rpm -qa | grep '^nginx')
 
 # installing packages
 touch /etc/default/mod-pagespeed
-rpm -ivh --force $(find "$SCRIPT_DIR/packages/$ARCH" -name "*" | grep -e \.rpm$)
+rpm -Uvh --replacefiles --force $(find "$SCRIPT_DIR/packages/$ARCH" -name "*" | grep -e \.rpm$)
 if (( $? != 0 )); then
 	echo "Couldn't install packages."
 	exit 1
@@ -70,7 +70,7 @@ fi
 
 ################## rpm dupes cleanup
 yum clean all
-package-cleanup -y --cleandupes
+#package-cleanup -y --cleandupes
 
 # update operating system
 yum -y update
@@ -222,12 +222,16 @@ mkdir -p /etc/webalizer.d/settings/sites-enabled-for-humans
 chmod 755 /etc/cron.daily/webpanel-daily-schedules
 
 # iptables
-iptables-save > /etc/sysconfig/iptables.bak
-iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT # Nginx
-iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 5000 -j ACCEPT # WebPanel
-iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 10000 -j ACCEPT # Webmin
-service iptables save
-service iptables restart
+# iptables-save > /etc/sysconfig/iptables.bak
+# iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT # Nginx
+# iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 5000 -j ACCEPT # WebPanel
+# iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 10000 -j ACCEPT # Webmin
+# service iptables save
+# service iptables restart
+service iptables stop
+service ip6tables stop
+chkconfig iptables off
+chkconfig ip6tables off
 
 # limits
 \mv /etc/security/limits.d/90-nproc.conf /etc/security/limits.d/90-nproc.conf.bak
