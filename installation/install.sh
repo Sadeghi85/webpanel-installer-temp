@@ -54,7 +54,7 @@ rpm -e --nodeps $(rpm -qa | grep '^bind')
 
 #installing packages
 # yum -y install mod_rpaf-0.6-2.el6.i686.rpm mod-pagespeed-stable_current_i386.rpm
-# yum -y install iftop iotop bind-utils bind-chroot bind htop nmap openssh-clients httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx webalizer vsftpd man net-snmp mail rsync wget
+# yum -y install iftop iotop bind-utils bind-chroot bind htop nmap openssh-clients httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx webalizer vsftpd man net-snmp mail rsync wget exim
 # yum -y install mysql
 
 #installing mysql55
