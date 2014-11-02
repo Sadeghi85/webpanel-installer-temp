@@ -36,25 +36,26 @@ rpm -e --nodeps $(rpm -qa | grep '^php')
 rpm -e --nodeps $(rpm -qa | grep '^httpd')
 ################## unistall nginx
 rpm -e --nodeps $(rpm -qa | grep '^nginx')
+################## unistall vsftpd
+rpm -e --nodeps $(rpm -qa | grep '^vsftpd')
+################## unistall bind
+rpm -e --nodeps $(rpm -qa | grep '^bind')
 
 ################## repos
-\cp "$SCRIPT_DIR/repos/CentOS-Base/etc/yum.repos.d/CentOS-Base.repo" /etc/yum.repos.d/CentOS-Base.repo
-
-\cp "$SCRIPT_DIR/repos/epel/etc/yum.repos.d/epel.repo" /etc/yum.repos.d/epel.repo
-\cp "$SCRIPT_DIR/repos/epel/etc/rpm/macros.ghc-srpm" /etc/rpm/macros.ghc-srpm
-
-\cp "$SCRIPT_DIR/repos/ius/etc/yum.repos.d/ius.repo" /etc/yum.repos.d/ius.repo
-\cp "$SCRIPT_DIR/repos/ius/etc/yum.repos.d/ius-archive.repo" /etc/yum.repos.d/ius-archive.repo
-
-\cp "$SCRIPT_DIR/repos/nginx/etc/yum.repos.d/nginx.repo" /etc/yum.repos.d/nginx.repo
-
-\cp "$SCRIPT_DIR/repos/rpmforge/etc/yum.repos.d/rpmforge.repo" /etc/yum.repos.d/rpmforge.repo
+\cp "$SCRIPT_DIR/repos/CentOS-Base.repo" /etc/yum.repos.d/CentOS-Base.repo
+\cp "$SCRIPT_DIR/repos/epel.repo" /etc/yum.repos.d/epel.repo
+\cp "$SCRIPT_DIR/repos/ius.repo" /etc/yum.repos.d/ius.repo
+\cp "$SCRIPT_DIR/repos/ius-archive.repo" /etc/yum.repos.d/ius-archive.repo
+\cp "$SCRIPT_DIR/repos/nginx.repo" /etc/yum.repos.d/nginx.repo
+\cp "$SCRIPT_DIR/repos/rpmforge.repo" /etc/yum.repos.d/rpmforge.repo
 
 ################# yum plugins
-# yum -y install yum-plugin-priorities yum-plugin-rpm-warm-cache yum-plugin-local yum-plugin-fastestmirror yum-plugin-replace yum-cron 	yum-plugin-remove-with-leaves yum-plugin-show-leaves yum-utils
+# yum -y install yum-plugin-priorities yum-plugin-rpm-warm-cache yum-plugin-local yum-plugin-replace yum-plugin-remove-with-leaves yum-plugin-show-leaves yum-utils
 
 #installing packages
-# yum -y install iftop iotop bind-utils htop nmap openssh-clients mysql httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx quota webalizer man net-snmp rrdtool mail rsync wget
+# yum -y install mod_rpaf-0.6-2.el6.i686.rpm mod-pagespeed-stable_current_i386.rpm
+# yum -y install iftop iotop bind-utils bind-chroot bind htop nmap openssh-clients httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx webalizer vsftpd man net-snmp mail rsync wget
+# yum -y install mysql
 
 #installing mysql55
 # yum -y replace mysql --replace-with mysql55
@@ -82,42 +83,37 @@ yum -y update
 \mv /etc/yum.conf /etc/yum.conf.bak
 \cp "$SCRIPT_DIR/settings/yum/yum.conf" /etc/yum.conf
 
-\mv /etc/sysconfig/yum-cron /etc/sysconfig/yum-cron.bak
-\cp "$SCRIPT_DIR/settings/yum-cron/yum-cron" /etc/sysconfig/yum-cron
-chkconfig yum-cron on
-service yum-cron restart
-
 \mv /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 \cp "$SCRIPT_DIR/settings/ssh/sshd_config" /etc/ssh/sshd_config
 service sshd restart
 
 # Quota
-TMP_DIR="/$HOME"
-QUOTA_DIR=""
-QUOTA_DIR_ESC=""
-while [[ $TMP_DIR != "" ]]
-do
-	if [[ $TMP_DIR != "/" ]]; then
-		QUOTA_DIR=$(echo "$TMP_DIR" | sed -r -e"s/^\/(.+)$/\1/");
-	else
-		QUOTA_DIR="/"
-	fi
+# TMP_DIR="/$HOME"
+# QUOTA_DIR=""
+# QUOTA_DIR_ESC=""
+# while [[ $TMP_DIR != "" ]]
+# do
+	# if [[ $TMP_DIR != "/" ]]; then
+		# QUOTA_DIR=$(echo "$TMP_DIR" | sed -r -e"s/^\/(.+)$/\1/");
+	# else
+		# QUOTA_DIR="/"
+	# fi
 	
-	if grep -qs " $QUOTA_DIR " /proc/mounts; then
-		QUOTA_DIR_ESC=$(sed 's/[\*\.&\/]/\\&/g' <<<"$QUOTA_DIR")
-		sed -i -r -e"s/( $QUOTA_DIR_ESC .*?defaults)/\1,usrjquota=aquota\.user,grpjquota=aquota\.group,jqfmt=vfsv0/I" /etc/fstab
-		mount -o remount "$QUOTA_DIR" 1>/dev/null
-		break
-	fi
+	# if grep -qs " $QUOTA_DIR " /proc/mounts; then
+		# QUOTA_DIR_ESC=$(sed 's/[\*\.&\/]/\\&/g' <<<"$QUOTA_DIR")
+		# sed -i -r -e"s/( $QUOTA_DIR_ESC .*?defaults)/\1,usrjquota=aquota\.user,grpjquota=aquota\.group,jqfmt=vfsv0/I" /etc/fstab
+		# mount -o remount "$QUOTA_DIR" 1>/dev/null
+		# break
+	# fi
 	
-	TMP_DIR=$(echo "$TMP_DIR" | sed -r -e"s/^(.*)\/.*?$/\1/")
-done
+	# TMP_DIR=$(echo "$TMP_DIR" | sed -r -e"s/^(.*)\/.*?$/\1/")
+# done
 
-quotacheck -avugm 1>/dev/null 2>/dev/null
-quotaon -avug 1>/dev/null 2>/dev/null
+# quotacheck -avugm 1>/dev/null 2>/dev/null
+# quotaon -avug 1>/dev/null 2>/dev/null
 
-echo -e "#!/bin/bash\ntouch /forcequotacheck" > /etc/cron.weekly/forcequotacheck
-chmod 755 /etc/cron.weekly/forcequotacheck
+# echo -e "#!/bin/bash\ntouch /forcequotacheck" > /etc/cron.weekly/forcequotacheck
+# chmod 755 /etc/cron.weekly/forcequotacheck
 
 ################# config after install
 chmod 750 $(find "$SCRIPT_DIR/../cmd" -name "*" | grep \.sh$)
