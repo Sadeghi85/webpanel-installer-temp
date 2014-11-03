@@ -240,11 +240,15 @@ chkconfig httpd on
 chkconfig mysqld on
 chkconfig nginx on
 chkconfig php-fpm on
+chkconfig named on
+chkconfig vsftpd on
 
 service httpd restart
 service mysqld restart
 service nginx restart
 service php-fpm restart
+service named restart
+service vsftpd restart
 
 #mysql_secure_installation
 mysql -u root <<EOF
