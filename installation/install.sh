@@ -40,6 +40,8 @@ rpm -e --nodeps $(rpm -qa | grep '^nginx')
 rpm -e --nodeps $(rpm -qa | grep '^vsftpd')
 ################## unistall bind
 rpm -e --nodeps $(rpm -qa | grep '^bind')
+################## unistall exim
+rpm -e --nodeps $(rpm -qa | grep '^exim')
 
 ################## repos
 \cp "$SCRIPT_DIR/repos/CentOS-Base.repo" /etc/yum.repos.d/CentOS-Base.repo
