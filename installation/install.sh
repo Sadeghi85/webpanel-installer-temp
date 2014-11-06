@@ -35,6 +35,7 @@ rpm -e --nodeps $(rpm -qa | grep '^webalizer')
 rpm -e --nodeps $(rpm -qa | grep '^php')
 ################## unistall apache
 rpm -e --nodeps $(rpm -qa | grep '^httpd')
+\mv /var/www /var/www.old
 ################## unistall nginx
 rpm -e --nodeps $(rpm -qa | grep '^nginx')
 ################## unistall vsftpd
