@@ -70,18 +70,16 @@ rpm -e --nodeps $(rpm -qa | grep '^epel-release')
 # yum -y install mysql55-server
 
 # installing packages
+# "rpm -U --force" is identixcal to "rpm -U --replacefiles --replacepkgs --oldpackage"
 touch /etc/default/mod-pagespeed
-rpm -Uvh --replacefiles --force $(find "$SCRIPT_DIR/packages/$ARCH" -name "*" | grep -e \.rpm$)
+rpm -Uvh --replacefiles --replacepkgs --oldpackage --nodeps  $(find "$SCRIPT_DIR/packages/$ARCH" -name "*" | grep -e \.rpm$)
 if (( $? != 0 )); then
 	echo "Couldn't install packages."
 	exit 1
 fi
 
-################## rpm dupes cleanup
-yum clean all
-#package-cleanup -y --cleandupes
-
 # update operating system
+yum clean all
 yum -y update
 
 ################## server configs
