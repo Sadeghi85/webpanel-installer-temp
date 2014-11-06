@@ -28,6 +28,7 @@ setenforce 0
 
 ################## unistall mysql for conflicts
 rpm -e --nodeps $(rpm -qa | grep '^mysql')
+\mv /var/lib/mysql /var/lib/mysql.old
 ################## unistall webalizer
 rpm -e --nodeps $(rpm -qa | grep '^webalizer')
 ################## unistall php
@@ -42,6 +43,11 @@ rpm -e --nodeps $(rpm -qa | grep '^vsftpd')
 rpm -e --nodeps $(rpm -qa | grep '^bind')
 ################## unistall exim
 rpm -e --nodeps $(rpm -qa | grep '^exim')
+################## unistall rpmforge-release
+rpm -e --nodeps $(rpm -qa | grep '^rpmforge-release')
+################## unistall epel-release
+rpm -e --nodeps $(rpm -qa | grep '^epel-release')
+
 
 ################## repos
 \cp "$SCRIPT_DIR/repos/CentOS-Base.repo" /etc/yum.repos.d/CentOS-Base.repo

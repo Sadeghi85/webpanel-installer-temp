@@ -1,6 +1,7 @@
 ### Name: RPMforge RPM Repository for RHEL 6 - dag
 ### URL: http://rpmforge.net/
 [rpmforge]
+priority=50
 name = RHEL $releasever - RPMforge.net - dag
 baseurl = http://apt.sw.be/redhat/el6/en/$basearch/rpmforge
 mirrorlist = http://mirrorlist.repoforge.org/el6/mirrors-rpmforge
