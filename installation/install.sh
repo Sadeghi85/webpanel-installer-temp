@@ -52,6 +52,7 @@ rpm -e --nodeps $(rpm -qa | grep '^epel-release')
 ################## repos
 \cp "$SCRIPT_DIR/repos/CentOS-Base.repo" /etc/yum.repos.d/CentOS-Base.repo
 \cp "$SCRIPT_DIR/repos/epel.repo" /etc/yum.repos.d/epel.repo
+\cp "$SCRIPT_DIR/repos/macros.ghc-srpm" /etc/rpm/macros.ghc-srpm
 \cp "$SCRIPT_DIR/repos/ius.repo" /etc/yum.repos.d/ius.repo
 \cp "$SCRIPT_DIR/repos/ius-archive.repo" /etc/yum.repos.d/ius-archive.repo
 \cp "$SCRIPT_DIR/repos/nginx.repo" /etc/yum.repos.d/nginx.repo
