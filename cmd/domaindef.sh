@@ -96,8 +96,8 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 
 	# correcting permissions on ftp home
 	STATUS=$(chown -R "$SERVER_TAG:apache" "$HOME/sites-available/$SERVER_TAG" 2>&1)
-	STATUS=$(chmod -R 644 "$HOME/sites-available/$SERVER_TAG" 2>&1)
-	STATUS=$(chmod -R +X "$HOME/sites-available/$SERVER_TAG" 2>&1) # to give search bit to all directories, effectively 755 for dirs
+	STATUS=$(chmod -R 664 "$HOME/sites-available/$SERVER_TAG" 2>&1) # 664 so panel users can interact with ftp dirs
+	STATUS=$(chmod -R +X "$HOME/sites-available/$SERVER_TAG" 2>&1) # to give search bit to all directories
 	
 	##################### creating PHP-FPM pool definition
 	STATUS=$(\mv "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf" "/etc/php-fpm.d/settings/sites-available/$SERVER_TAG.conf.bak" 2>&1)

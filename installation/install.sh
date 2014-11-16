@@ -31,15 +31,20 @@ rpm -e --nodeps $(rpm -qa | grep '^mysql')
 \mv /var/lib/mysql /var/lib/mysql.old
 ################## unistall webalizer
 rpm -e --nodeps $(rpm -qa | grep '^webalizer')
+\mv /etc/webalizer.d/settings /etc/webalizer.d/settings.old
 ################## unistall php
 rpm -e --nodeps $(rpm -qa | grep '^php')
+\mv /etc/php-fpm.d/settings /etc/php-fpm.d/settings.old
 ################## unistall apache
 rpm -e --nodeps $(rpm -qa | grep '^httpd')
+\mv /etc/httpd/settings /etc/httpd/settings.old
 \mv /var/www /var/www.old
 ################## unistall nginx
 rpm -e --nodeps $(rpm -qa | grep '^nginx')
+\mv /etc/nginx/settings /etc/nginx/settings.old
 ################## unistall vsftpd
 rpm -e --nodeps $(rpm -qa | grep '^vsftpd')
+\mv /etc/vsftpd/settings /etc/vsftpd/settings.old
 ################## unistall bind
 rpm -e --nodeps $(rpm -qa | grep '^bind')
 ################## unistall exim
@@ -133,6 +138,7 @@ mkdir -p "$HOME/sites-available-for-humans"
 mkdir -p "$HOME/sites-enabled-for-humans"
 
 # Apache
+\mv /usr/lib/cgi-bin /usr/lib/cgi-bin.old
 mkdir -p /usr/lib/cgi-bin
 mkdir -p /etc/httpd/settings/sites-available
 mkdir -p /etc/httpd/settings/sites-enabled
