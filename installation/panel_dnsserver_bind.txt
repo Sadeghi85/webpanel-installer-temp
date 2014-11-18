@@ -4,16 +4,25 @@ yum install bind-chroot bind bind-utils -y
 # comment listen-on, allow-query -> any, recursion -> no, add your own zone below "."
 vi /etc/named.conf
 [...]
+//
+// named.conf
+//
+// Provided by Red Hat bind package to configure the ISC BIND named(8) DNS
+// server as a caching only nameserver (as a localhost DNS resolver only).
+//
+// See /usr/share/doc/bind*/sample/ for example named configuration files.
+//
+
 options {
-	    #listen-on port 53 { 127.0.0.1; };
+        #listen-on port 53 { 127.0.0.1; };
         listen-on-v6 port 53 { ::1; };
-        directory	"/var/named";
-        dump-file	"/var/named/data/cache_dump.db";
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
         statistics-file "/var/named/data/named_stats.txt";
         memstatistics-file "/var/named/data/named_mem_stats.txt";
-		allow-query { any; };
+        allow-query     { any; };
         recursion no;
-		version "DNS";
+        version "DNS";
 
         dnssec-enable yes;
         dnssec-validation yes;
@@ -25,19 +34,31 @@ options {
         managed-keys-directory "/var/named/dynamic";
 };
 
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
+};
 
 zone "." IN {
         type hint;
         file "named.ca";
 };
 
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
+
+include "/etc/named/sadeghi85.ir.zones";
+[...]
+
+vi /etc/named/sadeghi85.ir.zones
+[...]
 zone "sadeghi85.ir" IN {
         type master;
         file "sadeghi85.ir.zone";
         allow-update { none; };
 };
-
-
 [...]
 
 vi /var/named/sadeghi85.ir.zone
@@ -60,7 +81,6 @@ ns2		IN	A		178.32.144.215
 ; Define hostname -> IP pairs which you wish to resolve
 @		IN	A		178.32.144.215
 www		IN	A		178.32.144.215
-
 [...]
 
 service named restart
