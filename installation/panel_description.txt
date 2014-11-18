@@ -1,0 +1,47 @@
+Web Panel:
+
+محدود کردن حجم سايت
+مجزا بودن اشکالات هر سايت. يعني اگر سايتي به خطا برخورد کرد باعث از کار افتادن سايت هاي ديگر نشود.
+مجزا بودن يوزرهاي هر سايت
+قابليت تعيين تنظيمات هر سايت به صورت مستقل و اختصاصي
+قابليت تعيين سرعت اختصاصي هر سايت
+لاگ
+آمار بازديد سايت
+نصب جوملا
+
+- Panel:
+	- Log rotation
+	- Domain-wide server settings (nginx,apache,php-fpm,mysql,pure-ftpd)
+	- Piwik server for statistics ? (inject php code globally for domain-wide stats or domain-specific manual js code ?)
+	- Password protection (htpasswd)
+	- Backup Manager (to another server)
+	- Server info
+	- Overall domain statistics
+	- Add (external/local) database server
+	- Server health (collectd plugins: rrdtool,cpu,df,disk,load,memory,processes, swap,interface)
+	
+- Users:
+	- Staff: each staff can only manage their assigned domains.
+	- Admin: admins can see all domains and activity logs of staff.
+	- Profile
+
+- Domain:
+	- Each domain contains:
+
+		- Ftp: ftp account(s) that corresponds to domain directory(web directory root is inside domain directory).
+		- MySQL: create database and db user for domain.
+		
+		- Mail account ?
+		
+	- Integrated file manager
+
+	- Quota
+	
+	- Domain specific server settings (nginx,apache,php-fpm)
+	
+	- Statistics
+
+		- Disk usage for domain
+		- Web statistics (webalizer, piwik ?)
+		- Traffic(bytes recieved or sent) ?
+		- Memory usage of domain ?

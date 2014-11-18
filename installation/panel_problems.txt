@@ -1,0 +1,20 @@
+# reloading php-fpm
+STATUS=$(/sbin/service php-fpm reload 2>&1)
+if (( $? != 0 )); then
+	echo "$STATUS"
+	exit 1
+fi
+
+** when php-fpm is stopped, reloading fails, but status code is 0.
+** also nginx and probably others
+
+----------------------------------------------------
+
+apache error log:
+
+[Tue Sep 09 13:42:29 2014] [error] [mod_pagespeed 1.8.31.4-4056 @12985] Can't enable fetch rate-limiting without statistics
+[Tue Sep 09 13:42:29 2014] [error] [mod_pagespeed 1.8.31.4-4056 @12986] Can't enable fetch rate-limiting without statistics
+
+----------------------------------------------------
+
+undo changes(create backups first) that've been done so far, when scripts (domaindel.sh etc..) fail at some point. delete backups after successful operation.

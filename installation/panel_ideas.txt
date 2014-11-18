@@ -1,0 +1,15 @@
+
+ftp: vsftp
+mail: dovecot + exim + spamassasin + maildrop
+dns: bind + bind-chroot
+
+bandwidth: inspired by vlogger, a script that processes nginx log files before midnight rotation and calculates daily bandwidth for each virtual-host and stores in a mysql table.
+
+no need for apache and php access log, nginx access log is enough?
+
+tailing nginx log to Piwik. it's possible. apparently it's more resource friendly to log to syslog-ng instead of file, from there it should be possible to write to file, import to Piwik and calculate bandwidth for virtual-hosts. it's possible with "mkfifo" which makes a named pipes and to nginx looks like a regular file. apparently if syslog-ng is not running when nginx starts, nginx will hang, so this needs to be taken into account.
+
+
+php options:
+
+1. http://help.pagodabox.com/customer/portal/articles/175475-understanding-the-boxfile#php-version

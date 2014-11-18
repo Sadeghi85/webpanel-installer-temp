@@ -1,0 +1,77 @@
+
+yum install bind-chroot bind bind-utils -y
+
+# comment listen-on, allow-query -> any, recursion -> no, add your own zone below "."
+vi /etc/named.conf
+[...]
+options {
+	    #listen-on port 53 { 127.0.0.1; };
+        listen-on-v6 port 53 { ::1; };
+        directory	"/var/named";
+        dump-file	"/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+		allow-query { any; };
+        recursion no;
+		version "DNS";
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+        dnssec-lookaside auto;
+
+        /* Path to ISC DLV key */
+        bindkeys-file "/etc/named.iscdlv.key";
+
+        managed-keys-directory "/var/named/dynamic";
+};
+
+
+zone "." IN {
+        type hint;
+        file "named.ca";
+};
+
+zone "sadeghi85.ir" IN {
+        type master;
+        file "sadeghi85.ir.zone";
+        allow-update { none; };
+};
+
+
+[...]
+
+vi /var/named/sadeghi85.ir.zone
+[...]
+$TTL 86400
+@   IN  SOA     ns1.sadeghi85.ir. root.sadeghi85.ir. (
+        2013042201  ;Serial
+        3600        ;Refresh
+        1800        ;Retry
+        1209600     ;Expire
+        86400       ;Minimum TTL
+)
+; Specify our two nameservers
+		IN	NS		ns1.sadeghi85.ir.
+		IN	NS		ns2.sadeghi85.ir.
+; Resolve nameserver hostnames to IP, replace with your two droplet IP addresses.
+ns1		IN	A		178.32.144.215
+ns2		IN	A		178.32.144.215
+
+; Define hostname -> IP pairs which you wish to resolve
+@		IN	A		178.32.144.215
+www		IN	A		178.32.144.215
+
+[...]
+
+service named restart
+chkconfig named on
+
+rndc reload
+
+vi /etc/sysconfig/network-scripts/ifcfg-eth0
+[...]
+DNS1=127.0.0.1
+[...]
+
+hostname
+hostname -f

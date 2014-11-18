@@ -1,0 +1,72 @@
+
+mail server:
+	- dovecot
+	- courier
+	- cyrus
+
+mail transfer agent:
+	- exim
+	- postfix
+	
+mail delivery agent(?):
+	- maildrop
+	- procmail
+	
+utility:
+	- amavis
+	- spamassasin
+	
+my choice:
+	dovecot + exim + spamassasin
+	
+	"You do know that exim can talk directly with MySQL, right ? And
+	since you can specify the SQL Queries, the database can have
+	any format, thus integrating with everything else ?
+
+	I even have exim sharing the same table with radius (and currier-imap)
+	on one of my sites.
+
+	Having exim talking directly with spamassassin is also very good and
+	easy, and speed things up quite a bit.
+
+	Using things like maildrop, vpopmail, amavis etc with exim is
+	just a good way to slow things down. The direct connection between
+	exim and everything else (spamassassin, antivirus etc) allows you
+	to reject mails during delivery, without the need to accept it
+	before passing to another agent.
+	
+	The thing is, many people don't realize that, when configuring exim
+	to use mysql, you write the SQL queries on the configuration file, so
+	you can pretty much do anything you want, even get data from multiple
+	tables. Also, you can put SQL lookups everywhere, even on the ACLs
+	(most specially on the ACLs), giving you a very good degree of flexibility.
+
+	Also, keeping everything happening inside exim, you make things much faster.
+	You don't have to keep forking new processes (which is costly for the OS),
+	and memory allocation is much smarter.
+	
+	spamd_address = 127.0.0.1 783
+
+	Then you just add the spam rules on the mime ACL.
+	
+	postfix -> milter -> spamd
+	exim -> spamd
+	
+	The main point is that Exim ACLs really rock. You can do everything there,
+	ranging from SPF, Greylisting, spamassassin and av, mixing them to your
+	delight. I can easily say that I don't want to check for spam or greylist
+	authenticated users, unless they come from a give network and are
+	sending e-mail to domain X. You can use some very interesting variables
+	on the acls for control, something like:
+
+		warn    set acl_m2 = ${lookup mysql{GREYLIST_TEST}{$value}{0}}
+
+	and then I can test for it:
+
+		condition = ${if eq{$acl_m2}{0}{1}}
+		
+	Did I mention you can have several conditions for the same rule ? :)
+	"
+	
+	
+	

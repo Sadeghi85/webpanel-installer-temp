@@ -1,0 +1,36 @@
+
+
+in this vsftpd config, by default directories are created with 755 and files with 644 perms, but chmod is allowed.
+
+php user (webxxx) can't ssh or ftp.
+
+multiple ftp users can be created for same site(php user). the trick is to use same uid as php user:
+	adduser --comment "alias of web001" -g apache --home "/var/www/WebPanel/sites-available/web001" --shell "/sbin/nologin" -u 506 -o "ch1admin"
+	passwd ch1admin
+	
+	adduser --comment "alias of web001" -g apache --home "/var/www/WebPanel/sites-available/web001" --shell "/sbin/nologin" -u 506 -o "ch1mod"
+	passwd ch1mod
+	
+here 506 is the uid of web001.
+
+these ftp users can't ssh but can ftp with their own user and password. all of them see the same directory structure. if one of them create a file the others can change it too because their effectively aliases for same account (this is the intended behaviour).
+
+
+for panel admins use this:
+	mkdir -p /var/www/WebPanel/panel-users/sadeghi/{sites-available,sites-enabled,sites-available-for-humans,sites-enabled-for-humans}
+	adduser --comment "panel user sadeghi" -g apache --home "/var/www/WebPanel/panel-users/sadeghi" --shell "/sbin/nologin" -u 0 -o "sadeghi"
+	passwd sadeghi
+
+0 is the uid of root, so panel users are effectively root and their group is same as php users (apache), but these users can't ssh login. in this way panel users can change any file in ftp because they're root, php user can also change files created by panel users because they're in same group and uploades files are by default group writable. ftp users however can't chmod files created by panel users.
+
+to restrict panel users to their assigned sites only, use "mount --bind":
+	mount --bind /var/www/WebPanel/sites-available/web003 /var/www/WebPanel/panel-users/sadeghi/sites-available/web003
+	mount --bind /var/www/WebPanel/sites-enabled/web003 /var/www/WebPanel/panel-users/sadeghi/sites-enabled/web003
+	mount --bind /var/www/WebPanel/sites-available-for-humans/web003 /var/www/WebPanel/panel-users/sadeghi/sites-available-for-humans/web003
+	mount --bind /var/www/WebPanel/sites-enabled-for-humans/web003 /var/www/WebPanel/panel-users/sadeghi/sites-enabled-for-humans/web003
+	
+"mount --bind" however doesn't persist after reboot, so this should be taken into account.
+
+
+
+
