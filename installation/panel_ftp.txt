@@ -31,6 +31,12 @@ to restrict panel users to their assigned sites only, use "mount --bind":
 	
 "mount --bind" however doesn't persist after reboot, so this should be taken into account.
 
-
+to make things more secure we only allow root user to use "su":
+	vi /etc/pam.d/su
+	[...]
+	auth		required	pam_wheel.so user=root
+	[...]
+	
+now normal users, although can ssh, can't su to panel users and become root and panel users can't ssh, although if they could, they would have root access. so no one can be root in a shell except root itself and sudoers users.
 
 

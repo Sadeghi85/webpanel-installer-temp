@@ -96,6 +96,9 @@ yum -y update
 \mv /etc/yum.conf /etc/yum.conf.bak
 \cp "$SCRIPT_DIR/settings/yum/yum.conf" /etc/yum.conf
 
+\mv /etc/pam.d/su /etc/pam.d/su.bak
+\cp "$SCRIPT_DIR/settings/pam.d/su" /etc/pam.d/su
+
 \mv /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 \cp "$SCRIPT_DIR/settings/ssh/sshd_config" /etc/ssh/sshd_config
 service sshd restart
