@@ -29,6 +29,8 @@ setenforce 0
 ################## unistall mysql for conflicts
 rpm -e --nodeps $(rpm -qa | grep '^mysql')
 \mv /var/lib/mysql /var/lib/mysql.old
+################## unistall memcached
+rpm -e --nodeps $(rpm -qa | grep '^memcached')
 ################## unistall webalizer
 rpm -e --nodeps $(rpm -qa | grep '^webalizer')
 \mv /etc/webalizer.d/settings /etc/webalizer.d/settings.old
@@ -69,7 +71,7 @@ rpm -e --nodeps $(rpm -qa | grep '^epel-release')
 
 #installing packages
 # yum -y install mod_rpaf-0.6-2.el6.i686.rpm mod-pagespeed-stable_current_i386.rpm
-# yum -y install iftop iotop bind-utils bind-chroot bind htop nmap openssh-clients httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx webalizer vsftpd man net-snmp mail rsync wget exim
+# yum -y install iftop iotop bind-utils bind-chroot bind htop nmap openssh-clients httpd php54 php54-bcmath php54-cli php54-common php54-fpm php54-gd php54-intl php54-mbstring php54-mcrypt php54-mysqlnd php54-odbc php54-pdo php54-pear php54-pecl-memcached php54-pecl-zendopcache php54-tidy php54-xml perl-Net-SSLeay mod_fastcgi nginx webalizer vsftpd man net-snmp mail memcached rsync wget exim
 # yum -y install mysql
 
 #installing mysql55
@@ -205,6 +207,10 @@ else
 	\cp "$SCRIPT_DIR/settings/php/opcache.ini.x86_64" /etc/php.d/opcache.ini
 fi
 
+# Memcached
+\mv /etc/sysconfig/memcached /etc/sysconfig/memcached.bak
+\cp "$SCRIPT_DIR/settings/memcached/memcached" /etc/sysconfig/memcached
+
 # Nginx
 \mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.disabled
 \mv /etc/nginx/conf.d/example_ssl.conf /etc/nginx/conf.d/example_ssl.conf.disabled
@@ -250,9 +256,10 @@ chkconfig ip6tables off
 \mv /etc/security/limits.d/90-nproc.conf /etc/security/limits.d/90-nproc.conf.bak
 \cp "$SCRIPT_DIR/settings/limits/90-nproc.conf" /etc/security/limits.d/90-nproc.conf
 
-# starting Apache, MySQL, Nginx & PHP-FPM
+# starting servers
 chkconfig httpd on
 chkconfig mysqld on
+chkconfig memcached on
 chkconfig nginx on
 chkconfig php-fpm on
 chkconfig named on
@@ -260,6 +267,7 @@ chkconfig vsftpd on
 
 service httpd restart
 service mysqld restart
+service memcached restart
 service nginx restart
 service php-fpm restart
 service named restart

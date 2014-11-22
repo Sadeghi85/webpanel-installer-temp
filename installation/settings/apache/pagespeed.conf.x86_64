@@ -46,11 +46,11 @@
 
 	# If you want, you can use one or more memcached servers as the store for
 	# the mod_pagespeed cache.
-	# ModPagespeedMemcachedServers localhost:11211
+	ModPagespeedMemcachedServers localhost:11211
 
 	# A portion of the cache can be kept in memory only, to reduce load on disk
 	# (or memcached) from many small files.
-	# ModPagespeedCreateSharedMemoryMetadataCache "/var/cache/mod_pagespeed/" 51200
+	ModPagespeedCreateSharedMemoryMetadataCache "/var/cache/mod_pagespeed/" 51200
 
 	# Override the mod_pagespeed 'rewrite level'. The default level
 	# "CoreFilters" uses a set of rewrite filters that are generally

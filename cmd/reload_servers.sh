@@ -30,6 +30,8 @@ if (( $? != 0 )); then
 	exit 1
 fi
 
+STATUS=$(/sbin/service memcached start 2>&1)
+
 # testing server configs
 STATUS=$(sh "$SCRIPT_DIR/test_servers.sh" 2>&1)
 if (( $? != 0 )); then
