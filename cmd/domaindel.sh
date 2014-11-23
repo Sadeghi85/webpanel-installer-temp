@@ -76,10 +76,22 @@ if (( $? != 0 )); then
 fi
 STATUS=$(\rm -f "/etc/webalizer.d/settings/sites-available-for-humans/$SERVER_PORT.$SERVER_NAME.conf" 2>&1)
 
+##################### removing server_name from /etc/hosts
+SERVER_NAME_ESCAPED=$(sed 's/[\*\.&\/]/\\&/g' <<<"$SERVER_NAME")
+STATUS=$(sed -i -e"s/127.0.0.1 $SERVER_NAME_ESCAPED//" "/etc/hosts" 2>&1)
+
 # deleting user
 STATUS=$(userdel "$SERVER_TAG" 2>&1)
 if (( $? != 0 )); then
 	echo "$STATUS"
+	exit 1
+fi
+
+##################### Reloading servers
+STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
+if (( $? != 0 )); then
+	echo "$STATUS"
+	STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 	exit 1
 fi
 

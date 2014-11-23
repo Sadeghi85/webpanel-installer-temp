@@ -51,13 +51,13 @@ STATUS=$(\mv "$HOME/sites-enabled/$SERVER_TAG" "$HOME/sites-enabled/$SERVER_TAG.
 STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
 if (( $? != 0 )); then
 	echo "$STATUS"
-	STATUS=$(\mv "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-	STATUS=$(\mv "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-	STATUS=$(\mv "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-	STATUS=$(\mv "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
-	STATUS=$(\mv "$HOME/sites-enabled/$SERVER_TAG.bak" "$HOME/sites-enabled/$SERVER_TAG" 2>&1)
+	#STATUS=$(\mv "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	#STATUS=$(\mv "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	#STATUS=$(\mv "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/nginx/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	#STATUS=$(\mv "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf.bak" "/etc/webalizer.d/settings/sites-enabled/$SERVER_TAG.conf" 2>&1)
+	#STATUS=$(\mv "$HOME/sites-enabled/$SERVER_TAG.bak" "$HOME/sites-enabled/$SERVER_TAG" 2>&1)
 	
-	exit 1
+	#exit 1
 else
 	STATUS=$(\rm -f "/etc/php-fpm.d/settings/sites-enabled/$SERVER_TAG.conf.bak" 2>&1)
 	STATUS=$(\rm -f "/etc/httpd/settings/sites-enabled/$SERVER_TAG.conf.bak" 2>&1)

@@ -226,6 +226,10 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 		exit 1
 	fi
+	
+	##################### adding server_name to /etc/hosts
+	STATUS=$(echo "127.0.0.1 $SERVER_NAME" >> /etc/hosts 2>&1)
+	
 else
 	echo "Directory ($HOME/sites-available/$SERVER_TAG) already exists."
 	exit 1
