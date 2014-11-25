@@ -162,23 +162,23 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 		exit 1
 	else
-		STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" -e"s/server_name .*/server_name $SERVER_NAME www.$SERVER_NAME;/" -e"s/listen .*/listen $SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+		STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" -e"s/server_name .*/server_name $SERVER_NAME:$SERVER_PORT www.$SERVER_NAME:$SERVER_PORT;/" -e"s/listen .*/listen $SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 		if (( $? != 0 )); then
 			echo "$STATUS"
 			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 			exit 1
 		fi
 		
-		if ! $(grep -Pqs "listen\s+$SERVER_PORT" "/etc/nginx/nginx_default_server.conf"); then
-			if (( $SERVER_PORT != 80 )); then
-				STATUS=$(sed -i -e"s/\(listen .*80 .*default_server;\)/\1 listen $SERVER_PORT default_server;/" "/etc/nginx/nginx_default_server.conf" 2>&1)
-				if (( $? != 0 )); then
-					echo "$STATUS"
-					STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
-					exit 1
-				fi
-			fi
-		fi
+		#if ! $(grep -Pqs "listen\s+$SERVER_PORT" "/etc/nginx/nginx_default_server.conf"); then
+		#	if (( $SERVER_PORT != 80 )); then
+		#		STATUS=$(sed -i -e"s/\(listen .*80 .*default_server;\)/\1 listen $SERVER_PORT default_server;/" "/etc/nginx/nginx_default_server.conf" 2>&1)
+		#		if (( $? != 0 )); then
+		#			echo "$STATUS"
+		#			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+		#			exit 1
+		#		fi
+		#	fi
+		#fi
 		
 	fi
 	
