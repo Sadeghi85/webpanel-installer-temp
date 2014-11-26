@@ -54,16 +54,16 @@ SERVER_NAME_ESCAPED=$(sed 's/[\*\.&\/]/\\&/g' <<<"$SERVER_NAME")
 
 
 ## apache
-STATUS=$(sed -i -e"s/\(ServerAlias .*?\)SERVER_PORT\.$SERVER_NAME_ESCAPED/\1/" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-STATUS=$(sed -i -e"s/ModPagespeedDomain \*$SERVER_NAME_ESCAPED//" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(sed -i -e"s/\(ServerAlias .*\)SERVER_PORT\.$SERVER_NAME_ESCAPED/\1/" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(sed -i -e"s/ModPagespeedDomain \s*\*$SERVER_NAME_ESCAPED//" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 
 ## nginx
 #STATUS=$(sed -i -e"s/\(listen .*\)/\1\n        listen $SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 #STATUS=$(sed -i -e"s/\(server_name .*?\);/\1 $SERVER_NAME:$SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-STATUS=$(sed -i -e"s/\(server_name .*?$\)SERVER_NAME_ESCAPED:$SERVER_PORT/\1/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(sed -i -e"s/\(server_name .*\)SERVER_NAME_ESCAPED/\1/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 
 ## hosts
-STATUS=$(sed -i -e"s/127.0.0.1 $SERVER_NAME_ESCAPED//" "/etc/hosts" 2>&1)
+STATUS=$(sed -i -e"s/127.0.0.1 $SERVER_NAME_ESCAPED//g" "/etc/hosts" 2>&1)
 
 ##################### Reloading servers
 STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
