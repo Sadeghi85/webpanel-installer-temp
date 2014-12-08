@@ -41,6 +41,14 @@ fi
 # check if ftp home already exists
 if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 
+	# creating session directory
+	STATUS=$(mkdir -p "/var/lib/php/session/$SERVER_TAG" 2>&1)
+	if (( $? != 0 )); then
+		echo "$STATUS"
+		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
+		exit 1
+	fi
+	
 	# creating ftp home & web root
 	STATUS=$(mkdir -p "$HOME/sites-available/$SERVER_TAG/$WEB_ROOT_DIR" 2>&1)
 	if (( $? != 0 )); then
@@ -94,6 +102,9 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 		fi
 	fi
 
+	# correcting permission on session directory
+	STATUS=$(chmod 777 "/var/lib/php/session/$SERVER_TAG" 2>&1)
+	
 	# correcting permissions on ftp home
 	STATUS=$(chown -R "$SERVER_TAG:apache" "$HOME/sites-available/$SERVER_TAG" 2>&1)
 	STATUS=$(chmod -R 664 "$HOME/sites-available/$SERVER_TAG" 2>&1) # 664 so panel users can interact with ftp dirs
