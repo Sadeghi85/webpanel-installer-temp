@@ -92,16 +92,19 @@ yum clean all
 yum -y update
 
 ################## server configs
-\mv /etc/selinux/config /etc/selinux/config.bak
+\cp /etc/selinux/config /etc/selinux/config.bak
 \cp "$SCRIPT_DIR/settings/selinux/config" /etc/selinux/config
 
-\mv /etc/yum.conf /etc/yum.conf.bak
+\cp /etc/yum.conf /etc/yum.conf.bak
 \cp "$SCRIPT_DIR/settings/yum/yum.conf" /etc/yum.conf
 
-\mv /etc/pam.d/su /etc/pam.d/su.bak
+\cp /etc/pam.d/su /etc/pam.d/su.bak
 \cp "$SCRIPT_DIR/settings/pam.d/su" /etc/pam.d/su
 
-\mv /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+\cp /etc/sudoers /etc/pam.d/sudoers.bak
+\cp "$SCRIPT_DIR/settings/sudoers/sudoers" /etc/sudoers
+
+\cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 \cp "$SCRIPT_DIR/settings/ssh/sshd_config" /etc/ssh/sshd_config
 service sshd restart
 
@@ -159,13 +162,13 @@ mkdir -p /etc/httpd/settings/sites-enabled-for-humans
 \mv /etc/httpd/conf.d/webalizer.conf /etc/httpd/conf.d/webalizer.conf.disabled
 \mv /etc/httpd/conf.d/wsgi.conf /etc/httpd/conf.d/wsgi.conf.disabled
 
-\mv /etc/sysconfig/httpd /etc/sysconfig/httpd.bak
+\cp /etc/sysconfig/httpd /etc/sysconfig/httpd.bak
 \cp "$SCRIPT_DIR/settings/apache/httpd" /etc/sysconfig/httpd
 
-\mv /etc/httpd/conf.d/fastcgi.conf /etc/httpd/conf.d/fastcgi.conf.bak
+\cp /etc/httpd/conf.d/fastcgi.conf /etc/httpd/conf.d/fastcgi.conf.bak
 \cp "$SCRIPT_DIR/settings/apache/fastcgi.conf" /etc/httpd/conf.d/fastcgi.conf
 
-\mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
+\cp /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
 \cp "$SCRIPT_DIR/settings/apache/welcome.conf" /etc/httpd/conf.d/welcome.conf
 
 \cp "$SCRIPT_DIR/settings/apache/deflate.conf.disabled" /etc/httpd/conf.d/deflate.conf.disabled
@@ -173,14 +176,14 @@ mkdir -p /etc/httpd/settings/sites-enabled-for-humans
 \cp "$SCRIPT_DIR/settings/apache/rpaf.conf" /etc/httpd/conf.d/rpaf.conf
 \cp "$SCRIPT_DIR/settings/apache/php-fpm.conf.disabled" /etc/httpd/conf.d/php-fpm.conf.disabled
 
-\mv /etc/httpd/conf.d/pagespeed.conf /etc/httpd/conf.d/pagespeed.conf.bak
+\cp /etc/httpd/conf.d/pagespeed.conf /etc/httpd/conf.d/pagespeed.conf.bak
 if [[ $ARCH == "i686" ]]; then
 	\cp "$SCRIPT_DIR/settings/apache/pagespeed.conf.i686" /etc/httpd/conf.d/pagespeed.conf
 else
 	\cp "$SCRIPT_DIR/settings/apache/pagespeed.conf.x86_64" /etc/httpd/conf.d/pagespeed.conf
 fi
 
-\mv /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.bak
+\cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.bak
 \cp "$SCRIPT_DIR/settings/apache/httpd.conf" /etc/httpd/conf/httpd.conf
 
 # PHP-FPM
@@ -193,14 +196,14 @@ mkdir -p /etc/php-fpm.d/settings/sites-enabled-for-humans
 \mv /etc/php-fpm.d/www.conf /etc/php-fpm.d/www.conf.bak
 \cp "$SCRIPT_DIR/settings/php-fpm/server.conf" /etc/php-fpm.d/server.conf
 
-\mv /etc/php-fpm.conf /etc/php-fpm.conf.bak
+\cp /etc/php-fpm.conf /etc/php-fpm.conf.bak
 \cp "$SCRIPT_DIR/settings/php-fpm/php-fpm.conf" /etc/php-fpm.conf
 
 # PHP
-\mv /etc/php.ini /etc/php.ini.bak
+\cp /etc/php.ini /etc/php.ini.bak
 \cp "$SCRIPT_DIR/settings/php/php.ini" /etc/php.ini
 
-\mv /etc/php.d/opcache.ini /etc/php.d/opcache.ini.bak
+\cp /etc/php.d/opcache.ini /etc/php.d/opcache.ini.bak
 if [[ $ARCH == "i686" ]]; then
 	\cp "$SCRIPT_DIR/settings/php/opcache.ini.i686" /etc/php.d/opcache.ini
 else
@@ -208,7 +211,7 @@ else
 fi
 
 # Memcached
-\mv /etc/sysconfig/memcached /etc/sysconfig/memcached.bak
+\cp /etc/sysconfig/memcached /etc/sysconfig/memcached.bak
 \cp "$SCRIPT_DIR/settings/memcached/memcached" /etc/sysconfig/memcached
 
 # Nginx
@@ -219,7 +222,7 @@ mkdir -p /etc/nginx/settings/sites-enabled
 mkdir -p /etc/nginx/settings/sites-available-for-humans
 mkdir -p /etc/nginx/settings/sites-enabled-for-humans
 
-\mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+\cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
 \cp "$SCRIPT_DIR/settings/nginx/nginx.conf" /etc/nginx/nginx.conf
 \cp "$SCRIPT_DIR/settings/nginx/nginx_default_server.conf" /etc/nginx/nginx_default_server.conf
 
@@ -253,7 +256,7 @@ chkconfig iptables off
 chkconfig ip6tables off
 
 # limits
-\mv /etc/security/limits.d/90-nproc.conf /etc/security/limits.d/90-nproc.conf.bak
+\cp /etc/security/limits.d/90-nproc.conf /etc/security/limits.d/90-nproc.conf.bak
 \cp "$SCRIPT_DIR/settings/limits/90-nproc.conf" /etc/security/limits.d/90-nproc.conf
 
 # starting servers

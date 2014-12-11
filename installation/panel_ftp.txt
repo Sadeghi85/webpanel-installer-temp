@@ -1,6 +1,6 @@
 
 
-in this vsftpd config, by default directories are created with 755 and files with 644 perms, but chmod is allowed.
+in this vsftpd config, by default directories are created with 775 and files with 664 perms, but chmod is allowed.
 
 php user (webxxx) can't ssh or ftp.
 
