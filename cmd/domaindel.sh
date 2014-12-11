@@ -87,6 +87,12 @@ if (( $? != 0 )); then
 	exit 1
 fi
 
+# setting owner to nobody
+STATUS=$(chown -R nobody:apache "/var/www/WebPanel/sites-available/$SERVER_TAG" 2>&1)
+if (( $? != 0 )); then
+	echo "$STATUS"
+fi
+
 ##################### Reloading servers
 STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
 if (( $? != 0 )); then

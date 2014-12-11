@@ -25,7 +25,13 @@ if (( $? == 0 )); then
 	fi
 	
 	# locking user
-	STATUS=$(passwd -l "$USER_NAME" 2>&1)
+	#STATUS=$(usermod --lock --expiredate 1970-01-01 "$USER_NAME" 2>&1)
+	#if (( $? != 0 )); then
+	#	echo "$STATUS"
+	#fi
+	
+	# change uid to 99 (nobody), not possible to do with usermod because uid 0 is logged in
+	STATUS=$(sed -i -r -e"s/^($USER_NAME:[^:]+):[0-9]+:/\1:99:/" "/etc/passwd" 2>&1)
 	if (( $? != 0 )); then
 		echo "$STATUS"
 	fi
@@ -34,6 +40,7 @@ if (( $? == 0 )); then
 	STATUS=$(userdel "$USER_NAME" 2>&1)
 	if (( $? != 0 )); then
 		echo "$STATUS"
+		exit 1
 	fi
 fi
 
