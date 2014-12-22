@@ -146,7 +146,7 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 		exit 1
 	else
-		STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" -e"s/ServerName 80.example.com/ServerName $SERVER_PORT.$SERVER_NAME/" -e"s/ServerAlias 80.www.example.com/ServerAlias $SERVER_PORT.www.$SERVER_NAME/" -e"s/ModPagespeedDomain \*example.com/ModPagespeedDomain *$SERVER_NAME/" -e"s/ServerAdmin .*/ServerAdmin postmaster@$SERVER_NAME/" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+		STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" -e"s/ServerName 80.example.com/ServerName $SERVER_PORT.$SERVER_NAME/" -e"s/ServerAlias 80.example.com/ServerAlias $SERVER_PORT.$SERVER_NAME/" -e"s/ModPagespeedDomain \*example.com/ModPagespeedDomain *$SERVER_NAME/" -e"s/ServerAdmin .*/ServerAdmin postmaster@$SERVER_NAME/" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 		if (( $? != 0 )); then
 			echo "$STATUS"
 			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
@@ -173,7 +173,7 @@ if [[ ! -e "$HOME/sites-available/$SERVER_TAG" ]]; then
 		STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)
 		exit 1
 	else
-		STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" -e"s/server_name .*/server_name $SERVER_NAME www.$SERVER_NAME;/" -e"s/listen .*/listen $SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+		STATUS=$(sed -i -e"s/web001/$SERVER_TAG/g" -e"s/server_name .*/server_name $SERVER_NAME;/" -e"s/listen .*/listen $SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 		if (( $? != 0 )); then
 			echo "$STATUS"
 			STATUS=$(sh "$SCRIPT_DIR/domaindis.sh $SERVER_TAG $SERVER_NAME $SERVER_PORT" 2>&1)

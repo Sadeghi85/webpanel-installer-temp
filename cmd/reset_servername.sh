@@ -50,14 +50,15 @@ STATUS=$(\cp "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" "/etc/httpd/
 STATUS=$(\cp "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf.bak" 2>&1)
 
 ## apache
-STATUS=$(sed -i -e"s/\(ServerAlias .*\)/\1 $SERVER_PORT.$SERVER_NAME/" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(sed -i -e"s/\(ServerName \).*/\1$SERVER_PORT.$SERVER_NAME/" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(sed -i -e"s/\(ServerAlias \).*/\1$SERVER_PORT.$SERVER_NAME/" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(sed -i -e"s/ModPagespeedDomain .*//g" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 STATUS=$(sed -i -e"s/\(ServerAlias .*\)/\1\n    ModPagespeedDomain *$SERVER_NAME/" "/etc/httpd/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 
 ## nginx
-STATUS=$(sed -i -e"s/server_name \(.*\)/server_name $SERVER_NAME \1/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-if ! $(grep -Pqs "listen\s+$SERVER_PORT" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf"); then
-	STATUS=$(sed -i -e"s/\(listen .*\)/\1\n        listen $SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
-fi
+#STATUS=$(sed -i -e"s/\(listen .*\)/\1\n        listen $SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+#STATUS=$(sed -i -e"s/\(server_name .*?\);/\1 $SERVER_NAME:$SERVER_PORT;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
+STATUS=$(sed -i -e"s/\(server_name \).*/\1$SERVER_NAME;/" "/etc/nginx/settings/sites-available/$SERVER_TAG.conf" 2>&1)
 
 ## hosts
 STATUS=$(echo "127.0.0.1 $SERVER_NAME" >> /etc/hosts 2>&1)
