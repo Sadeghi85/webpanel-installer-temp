@@ -62,6 +62,7 @@ STATUS=$(sed -i -e"s/listen [[:space:]]*$OLD_SERVER_PORT.*/listen $NEW_SERVER_PO
 
 ## for-humans
 STATUS=$(\mv "$HOME/sites-available-for-humans/$OLD_SERVER_PORT.$SERVER_NAME" "$HOME/sites-available-for-humans/$NEW_SERVER_PORT.$SERVER_NAME" 2>&1)
+STATUS=$(\mv "$HOME/sites-enabled-for-humans/$OLD_SERVER_PORT.$SERVER_NAME" "$HOME/sites-enabled-for-humans/$NEW_SERVER_PORT.$SERVER_NAME" 2>&1)
 
 ##################### Reloading servers
 STATUS=$(sh "$SCRIPT_DIR/reload_servers.sh" 2>&1)
